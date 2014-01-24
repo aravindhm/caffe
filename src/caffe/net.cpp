@@ -138,6 +138,18 @@ void Net<Dtype>::Init(const NetParameter& param) {
     LOG(INFO) << "This network produces output " << *it;
     net_output_blobs_.push_back(blobs_[blob_name_to_idx[*it]].get());
   }
+
+  // Next, we read the parameters to know which blobs are shared
+  for (int i = 0; i < param.shared_blobs_size(); i++) {
+    vector<Blob<Dtype>*> blob_list;
+    for (int j = 0; j < param.shared_blobs(i).blobs_size(); j++) {
+      blob_list.push_back(blobs_[blob_name_to_idx[param.shared_blobs(i).blobs(j)]].get());
+      LOG(INFO) << param.shared_blobs(i).blobs(j);
+    }
+    shared_blobs_.push_back(blob_list);
+  }
+ 
+  
   GetLearningRateAndWeightDecay();
   LOG(INFO) << "Network initialization done.";
 }

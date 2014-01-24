@@ -196,6 +196,7 @@ void SGDSolver<Dtype>::PreSolve() {
 template <typename Dtype>
 void SGDSolver<Dtype>::ComputeUpdateValue() {
   vector<shared_ptr<Blob<Dtype> > >& net_params = this->net_->params();
+  vector<vector<Blob<Dtype>*> >& shared_blobs = this->net_->shared_blobs();
   vector<float>& net_params_lr = this->net_->params_lr();
   vector<float>& net_params_weight_decay = this->net_->params_weight_decay();
   // get the learning rate
@@ -226,6 +227,31 @@ void SGDSolver<Dtype>::ComputeUpdateValue() {
           history_[param_id]->cpu_data(),
           net_params[param_id]->mutable_cpu_diff());
     }
+    // Now consider all shared layer lists and compute the average weight for them
+    for(int i = 0; i < shared_blobs.size(); i++) {
+      int count = shared_blobs[i].size(); //the number of blobs sharing parameters
+      if( count <= 1) { continue; }
+      vector<Blob<Dtype>*> a_shared_blobs_list = shared_blobs[i];
+      int N = a_shared_blobs_list[0]->count();
+      // first accumulate the sum into the last of the sharing layers
+      for (int j = 0; j < count-1; j++) {
+        caffe_axpy(N,
+                   (Dtype)1,
+                   a_shared_blobs_list[j]->cpu_diff(),
+                   a_shared_blobs_list[count-1]->mutable_cpu_diff());
+      }
+      // normalize this by the number of sharing layers - we want the average and not the sum.
+      caffe_scal(N,
+                 ((Dtype)1)/count,
+                 a_shared_blobs_list[count-1]->mutable_cpu_diff()); 
+      // Copy the average into the other sharing layers so that all of them become the average
+      for (int j = 0; j < count-1; j++) {
+        caffe_copy(N,
+                   a_shared_blobs_list[count-1]->cpu_diff(),
+                   a_shared_blobs_list[j]->mutable_cpu_diff());
+      }
+      //TODO: Repeat this for history_ . This stores the momentum information and we want to have the average momentum in it
+    }
     break;
   case Caffe::GPU:
     for (int param_id = 0; param_id < net_params.size(); ++param_id) {
@@ -246,6 +272,31 @@ void SGDSolver<Dtype>::ComputeUpdateValue() {
       caffe_gpu_copy(net_params[param_id]->count(),
           history_[param_id]->gpu_data(),
           net_params[param_id]->mutable_gpu_diff());
+    }
+    // Now consider all shared layer lists and compute the average weight for them
+    for(int i = 0; i < shared_blobs.size(); i++) {
+      int count = shared_blobs[i].size(); //the number of blobs sharing parameters
+      if( count <= 1) { continue; }
+      vector<Blob<Dtype>*> a_shared_blobs_list = shared_blobs[i];
+      int N = a_shared_blobs_list[0]->count();
+      // first accumulate the sum into the last of the sharing layers
+      for (int j = 0; j < count-1; j++) {
+        caffe_gpu_axpy(N,
+                   (Dtype)1,
+                   a_shared_blobs_list[j]->gpu_diff(),
+                   a_shared_blobs_list[count-1]->mutable_gpu_diff());
+      }
+      // normalize this by the number of sharing layers - we want the average and not the sum.
+      caffe_gpu_scal(N,
+                 ((Dtype)1)/count,
+                 a_shared_blobs_list[count-1]->mutable_gpu_diff()); 
+      // Copy the average into the other sharing layers so that all of them become the average
+      for (int j = 0; j < count-1; j++) {
+        caffe_gpu_copy(N,
+                   a_shared_blobs_list[count-1]->gpu_diff(),
+                   a_shared_blobs_list[j]->mutable_gpu_diff());
+      }
+      //TODO: Repeat this for history_ . This stores the momentum information and we want to have the average momentum in it
     }
     break;
   default:

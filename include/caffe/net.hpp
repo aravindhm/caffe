@@ -82,6 +82,9 @@ class Net {
   inline int num_outputs() { return net_output_blobs_.size(); }
   inline vector<Blob<Dtype>*>& input_blobs() { return net_input_blobs_; }
   inline vector<Blob<Dtype>*>& output_blobs() { return net_output_blobs_; }
+  // Return the list of blobs that share parameters
+  inline vector<vector<Blob<Dtype>*> >& shared_blobs() { return shared_blobs_; }
+
 
  protected:
   // Function to get misc parameters, e.g. the learning rate multiplier and
@@ -116,6 +119,10 @@ class Net {
   vector<float> params_lr_;
   // the weight decay multipliers
   vector<float> params_weight_decay_;
+
+  // the layer parameter sharing information
+  vector<vector<Blob<Dtype>*> > shared_blobs_;
+
   DISABLE_COPY_AND_ASSIGN(Net);
 };
 

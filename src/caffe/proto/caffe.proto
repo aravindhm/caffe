@@ -112,6 +112,11 @@ message NetParameter {
   // If set False, then whether to carry out backward is determined
   // automatically according to the net structure and learning rates.
   optional bool force_backward = 5 [ default = false ];
+  // The layers which share parameters. This is represented as a sequence of sequences.
+  message SharedBlobsList {
+    repeated string blobs = 1;
+  }
+  repeated SharedBlobsList shared_blobs = 6;
 }
 
 message SolverParameter {
