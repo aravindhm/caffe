@@ -123,6 +123,23 @@ Dtype EuclideanLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
 }
 
 template <typename Dtype>
+Dtype EuclideanLossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
+    const bool propagate_down, vector<Blob<Dtype>*>* bottom) {
+  int count = (*bottom)[0]->count();
+  int num = (*bottom)[0]->num();
+  caffe_gpu_sub(count, (*bottom)[0]->gpu_data(), (*bottom)[1]->gpu_data(),
+      difference_.mutable_gpu_data());
+  Dtype loss;
+  caffe_gpu_dot(
+      count, difference_.gpu_data(), difference_.gpu_data(), &loss);
+  loss = loss / num / Dtype(2);
+  // Compute the gradient
+  caffe_gpu_axpby(count, Dtype(1) / num, difference_.gpu_data(), Dtype(0),
+      (*bottom)[0]->mutable_gpu_diff());
+  return loss;
+}
+
+template <typename Dtype>
 void AccuracyLayer<Dtype>::SetUp(
   const vector<Blob<Dtype>*>& bottom, vector<Blob<Dtype>*>* top) {
   CHECK_EQ(bottom.size(), 2) << "Accuracy Layer takes two blobs as input.";

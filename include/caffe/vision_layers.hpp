@@ -467,8 +467,8 @@ class EuclideanLossLayer : public Layer<Dtype> {
       vector<Blob<Dtype>*>* top) { return; }
   virtual Dtype Backward_cpu(const vector<Blob<Dtype>*>& top,
       const bool propagate_down, vector<Blob<Dtype>*>* bottom);
-  // virtual Dtype Backward_gpu(const vector<Blob<Dtype>*>& top,
-  //     const bool propagate_down, vector<Blob<Dtype>*>* bottom);
+  virtual Dtype Backward_gpu(const vector<Blob<Dtype>*>& top,
+       const bool propagate_down, vector<Blob<Dtype>*>* bottom);
   Blob<Dtype> difference_;
 };
 
