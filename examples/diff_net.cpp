@@ -13,6 +13,8 @@
 
 #include "caffe/caffe.hpp"
 
+#include <iostream>
+
 using namespace caffe;
 
 int main(int argc, char** argv) {

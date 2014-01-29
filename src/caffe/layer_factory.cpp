@@ -49,6 +49,8 @@ Layer<Dtype>* GetLayer(const LayerParameter& param) {
     return new PoolingLayer<Dtype>(param);
   } else if (type == "relu") {
     return new ReLULayer<Dtype>(param);
+  } else if (type == "tanh") {
+    return new TanHLayer<Dtype>(param);
   } else if (type == "softmax") {
     return new SoftmaxLayer<Dtype>(param);
   } else if (type == "softmax_loss") {
