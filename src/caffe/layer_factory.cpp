@@ -31,6 +31,8 @@ Layer<Dtype>* GetLayer(const LayerParameter& param) {
     return new DropoutLayer<Dtype>(param);
   } else if (type == "euclidean_loss") {
     return new EuclideanLossLayer<Dtype>(param);
+  } else if (type == "euclidean") {
+    return new EuclideanLayer<Dtype>(param);
   } else if (type == "flatten") {
     return new FlattenLayer<Dtype>(param);
   } else if (type == "im2col") {

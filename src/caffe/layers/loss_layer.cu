@@ -10,6 +10,8 @@
 
 using std::max;
 
+#include <iostream>
+
 namespace caffe {
 
 const float kLOG_THRESHOLD = 1e-20;
@@ -97,15 +99,16 @@ template <typename Dtype>
 void EuclideanLossLayer<Dtype>::SetUp(
   const vector<Blob<Dtype>*>& bottom, vector<Blob<Dtype>*>* top) {
   CHECK_EQ(bottom.size(), 2) << "Loss Layer takes two blobs as input.";
-  CHECK_EQ(top->size(), 0) << "Loss Layer takes no as output.";
+  CHECK_LE(top->size(), 0) << "Loss Layer takes no outputs.";
   CHECK_EQ(bottom[0]->num(), bottom[1]->num())
-      << "The data and label should have the same number.";
+      << "The data1 and data2 should have the same number.";
   CHECK_EQ(bottom[0]->channels(), bottom[1]->channels());
   CHECK_EQ(bottom[0]->height(), bottom[1]->height());
   CHECK_EQ(bottom[0]->width(), bottom[1]->width());
   difference_.Reshape(bottom[0]->num(), bottom[0]->channels(),
       bottom[0]->height(), bottom[0]->width());
 }
+
 
 template <typename Dtype>
 Dtype EuclideanLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
