@@ -6,6 +6,10 @@
 
 #include "caffe/common.hpp"
 #include "caffe/util/math_functions.hpp"
+#include <thrust/device_vector.h>
+#include <thrust/transform.h>
+
+#include <iostream>
 
 namespace caffe {
 
@@ -46,15 +50,33 @@ __global__ void sub_kernel(const int n, const Dtype* a,
 template <>
 void caffe_gpu_sub<float>(const int N, const float* a,
     const float* b, float* y) {
-  sub_kernel<float><<<CAFFE_GET_BLOCKS(N)/10, CAFFE_CUDA_NUM_THREADS>>>(
+  int deviceid;
+  cudaGetDevice(&deviceid);
+  int numSMs;
+  cudaDeviceGetAttribute(&numSMs, cudaDevAttrMultiProcessorCount, deviceid);
+  sub_kernel<float><<<numSMs, CAFFE_CUDA_NUM_THREADS>>>(
       N, a, b, y);
+  /*thrust::device_ptr<const float> dev_ptr_a(a);
+  thrust::device_ptr<const float> dev_ptr_b(b);
+  thrust::device_ptr<float> dev_ptr_y(y);
+  thrust::transform(dev_ptr_a, dev_ptr_a + N, dev_ptr_b, dev_ptr_y, thrust::minus<float>());
+  */
 }
 
 template <>
 void caffe_gpu_sub<double>(const int N, const double* a,
     const double* b, double* y) {
-  sub_kernel<double><<<CAFFE_GET_BLOCKS(N)/10, CAFFE_CUDA_NUM_THREADS>>>(
+  int deviceid;
+  cudaGetDevice(&deviceid);
+  int numSMs;
+  cudaDeviceGetAttribute(&numSMs, cudaDevAttrMultiProcessorCount, deviceid);
+  sub_kernel<double><<<numSMs, CAFFE_CUDA_NUM_THREADS>>>(
       N, a, b, y);
+  /*thrust::device_ptr<const double> dev_ptr_a(a);
+  thrust::device_ptr<const double> dev_ptr_b(b);
+  thrust::device_ptr<double> dev_ptr_y(y);
+  thrust::transform(dev_ptr_a, dev_ptr_a + N, dev_ptr_b, dev_ptr_y, thrust::minus<double>());
+  */
 }
 
 

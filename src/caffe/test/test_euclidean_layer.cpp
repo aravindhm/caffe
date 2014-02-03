@@ -22,8 +22,8 @@ template <typename Dtype>
 class EuclideanLayerTest : public ::testing::Test {
  protected:
   EuclideanLayerTest()
-      : blob_bottom_data_(new Blob<Dtype>(10, 5, 1, 1)),
-        blob_bottom_label_(new Blob<Dtype>(10, 5, 1, 1)),
+      : blob_bottom_data_(new Blob<Dtype>(10, 5, 100, 300)),
+        blob_bottom_label_(new Blob<Dtype>(10, 5, 100, 300)),
         blob_top_(new Blob<Dtype>()) {
     // fill the values
     FillerParameter filler_param;
@@ -54,7 +54,7 @@ TYPED_TEST(EuclideanLayerTest, TestSetUp) {
   shared_ptr<EuclideanLayer<TypeParam> > layer(
   	new EuclideanLayer<TypeParam>(layer_param));
   layer->SetUp(this->blob_bottom_vec_, &(this->blob_top_vec_));
-  EXPECT_EQ(this->blob_top_->num(), 10);
+  EXPECT_EQ(this->blob_top_->num(), 1);
   EXPECT_EQ(this->blob_top_->height(), 1);
   EXPECT_EQ(this->blob_top_->width(), 1);
   EXPECT_EQ(this->blob_top_->channels(), 1);
@@ -71,8 +71,8 @@ TYPED_TEST(EuclideanLayerTest, TestCPU) {
   TypeParam sum = 0;
   for (int n = 0; n < 10; ++n) {
     for (int c = 0; c < 5; ++c) {
-      for (int h = 0; h < 1; ++h) {
-        for (int w = 0; w < 1; ++w) {
+      for (int h = 0; h < 100; ++h) {
+        for (int w = 0; w < 300; ++w) {
           sum += pow((this->blob_bottom_vec_[0]->data_at(n,c,h,w) - 
                  this->blob_bottom_vec_[1]->data_at(n,c,h,w)), 2);
         }
@@ -94,8 +94,8 @@ TYPED_TEST(EuclideanLayerTest, TestGPU) {
   TypeParam sum = 0;
   for (int n = 0; n < 10; ++n) {
     for (int c = 0; c < 5; ++c) {
-      for (int h = 0; h < 1; ++h) {
-        for (int w = 0; w < 1; ++w) {
+      for (int h = 0; h < 100; ++h) {
+        for (int w = 0; w < 300; ++w) {
           sum += pow((this->blob_bottom_vec_[0]->data_at(n,c,h,w) - 
                  this->blob_bottom_vec_[1]->data_at(n,c,h,w)), 2);
         }
@@ -124,4 +124,5 @@ TYPED_TEST(EuclideanLayerTest, TestGradientGPU) {
   checker.CheckGradientExhaustive(layer, this->blob_bottom_vec_,
       this->blob_top_vec_);
 }
+
 }
