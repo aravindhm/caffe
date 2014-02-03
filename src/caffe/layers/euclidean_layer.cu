@@ -25,7 +25,8 @@ void EuclideanLayer<Dtype>::SetUp(
   CHECK_EQ(bottom[0]->width(), bottom[1]->width());
   difference_.Reshape(bottom[0]->num(), bottom[0]->channels(),
       bottom[0]->height(), bottom[0]->width());
-  (*top)[0]->Reshape(1, 1, 1, 1);
+  (*top)[0]->Reshape(bottom[0]->num(), 1, 1, 1); 
+  //one output per data point in the mini batch
 }
 
 template <typename Dtype>
@@ -35,9 +36,12 @@ void EuclideanLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     int num = bottom[0]->num();
     caffe_sub(count, bottom[0]->cpu_data(), bottom[1]->cpu_data(),
         difference_.mutable_cpu_data());
-    Dtype loss = caffe_cpu_dot(
-        count, difference_.cpu_data(), difference_.cpu_data()) / num;
-    (*top)[0]->mutable_cpu_data()[0] = loss;
+    Dtype loss;
+    for(int i = 0; i < bottom[0]->num(); i++) {
+      loss = caffe_cpu_dot(
+          count/num, difference_.cpu_data() + num*i*sizeof(Dtype), difference_.cpu_data() + num*i*sizeof(Dtype));
+      ((Dtype*)(*top)[0]->mutable_cpu_data())[i] = loss;
+    }
 }
 
 template <typename Dtype>
@@ -48,9 +52,11 @@ void EuclideanLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     caffe_gpu_sub(count, bottom[0]->gpu_data(), bottom[1]->gpu_data(),
         difference_.mutable_gpu_data());
     Dtype loss;
-    caffe_gpu_dot(count, 
-        difference_.gpu_data(), difference_.gpu_data(), &loss);
-    (*top)[0]->mutable_cpu_data()[0] = loss/num;
+    for(int i = 0; i < bottom[0]->num(); i++) {
+      caffe_gpu_dot(count/num, 
+          difference_.gpu_data() + num*i*sizeof(Dtype), difference_.gpu_data() + num*i*sizeof(Dtype), &loss);
+      ((Dtype*)(*top)[0]->mutable_cpu_data())[i] = loss;
+    }
 }
 
 template <typename Dtype>
