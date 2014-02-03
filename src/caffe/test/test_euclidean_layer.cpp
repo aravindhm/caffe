@@ -23,7 +23,8 @@ class EuclideanLayerTest : public ::testing::Test {
  protected:
   EuclideanLayerTest()
       : blob_bottom_data_(new Blob<Dtype>(10, 5, 1, 1)),
-        blob_bottom_label_(new Blob<Dtype>(10, 5, 1, 1)) {
+        blob_bottom_label_(new Blob<Dtype>(10, 5, 1, 1)),
+        blob_top_(new Blob<Dtype>()) {
     // fill the values
     FillerParameter filler_param;
     GaussianFiller<Dtype> filler(filler_param);
@@ -31,14 +32,16 @@ class EuclideanLayerTest : public ::testing::Test {
     blob_bottom_vec_.push_back(blob_bottom_data_);
     filler.Fill(this->blob_bottom_label_);
     blob_bottom_vec_.push_back(blob_bottom_label_);
+    blob_top_vec_.push_back(blob_top_);
   }
   virtual ~EuclideanLayerTest() {
     delete blob_bottom_data_;
     delete blob_bottom_label_;
+    delete blob_top_;
   }
   Blob<Dtype>* const blob_bottom_data_;
   Blob<Dtype>* const blob_bottom_label_;
-  Blob<Dtype>* blob_top_data_;
+  Blob<Dtype>* blob_top_;
   vector<Blob<Dtype>*> blob_bottom_vec_;
   vector<Blob<Dtype>*> blob_top_vec_;
 };
@@ -46,41 +49,25 @@ class EuclideanLayerTest : public ::testing::Test {
 typedef ::testing::Types<float, double> Dtypes;
 TYPED_TEST_CASE(EuclideanLayerTest, Dtypes);
 
-TYPED_TEST(EuclideanLayerTest, TestGradientCPU) {
+TYPED_TEST(EuclideanLayerTest, TestSetUp) {
   LayerParameter layer_param;
-  Caffe::set_mode(Caffe::CPU);
-  EuclideanLayer<TypeParam> layer(layer_param);
-  layer.SetUp(this->blob_bottom_vec_, &this->blob_top_vec_);
-  GradientChecker<TypeParam> checker(1e-2, 1e-2, 1701);
-  checker.CheckGradientSingle(layer, this->blob_bottom_vec_,
-      this->blob_top_vec_, 0, -1, -1);
+  shared_ptr<EuclideanLayer<TypeParam> > layer(
+  	new EuclideanLayer<TypeParam>(layer_param));
+  layer->SetUp(this->blob_bottom_vec_, &(this->blob_top_vec_));
+  EXPECT_EQ(this->blob_top_->num(), 10);
+  EXPECT_EQ(this->blob_top_->height(), 1);
+  EXPECT_EQ(this->blob_top_->width(), 1);
+  EXPECT_EQ(this->blob_top_->channels(), 1);
 }
 
-TYPED_TEST(EuclideanLayerTest, TestGradientGPU) {
-  LayerParameter layer_param;
-  Caffe::set_mode(Caffe::GPU);
-  EuclideanLayer<TypeParam> layer(layer_param);
-  layer.SetUp(this->blob_bottom_vec_, &this->blob_top_vec_);
-  GradientChecker<TypeParam> checker(1e-2, 1e-2, 1701);
-  checker.CheckGradientSingle(layer, this->blob_bottom_vec_,
-      this->blob_top_vec_, 0, -1, -1);
-}
 
 TYPED_TEST(EuclideanLayerTest, TestCPU) {
   LayerParameter layer_param;
   Caffe::set_mode(Caffe::CPU);
-  EuclideanLayer<TypeParam> layer(layer_param);
-  this->blob_top_data_ = new Blob<TypeParam>(1,1,1,1);
-  //I'm doing this here because I don't know how to change
-  // the gradient checks when top is non empty. If I do these up in
-  // the constructor the call to the gradient checker segfaults.
-  this->blob_top_vec_.push_back(this->blob_top_data_);
-  layer.SetUp(this->blob_bottom_vec_, &(this->blob_top_vec_));
-  layer.Forward(this->blob_bottom_vec_, &(this->blob_top_vec_));
-  EXPECT_EQ(this->blob_top_vec_[0]->num(), 1);
-  EXPECT_EQ(this->blob_top_vec_[0]->channels(), 1);
-  EXPECT_EQ(this->blob_top_vec_[0]->height(), 1);
-  EXPECT_EQ(this->blob_top_vec_[0]->width(), 1);
+  shared_ptr<EuclideanLayer<TypeParam> > layer(
+  	new EuclideanLayer<TypeParam>(layer_param));
+  layer->SetUp(this->blob_bottom_vec_, &(this->blob_top_vec_));
+  layer->Forward(this->blob_bottom_vec_, &(this->blob_top_vec_));
   TypeParam sum = 0;
   for (int n = 0; n < 10; ++n) {
     for (int c = 0; c < 5; ++c) {
@@ -100,18 +87,10 @@ TYPED_TEST(EuclideanLayerTest, TestCPU) {
 TYPED_TEST(EuclideanLayerTest, TestGPU) {
   LayerParameter layer_param;
   Caffe::set_mode(Caffe::GPU);
-  EuclideanLayer<TypeParam> layer(layer_param);
-  this->blob_top_data_ = new Blob<TypeParam>(1,1,1,1); 
-  //I'm doing this here because I don't know how to change
-  // the gradient checks when top is non empty. If I do these up in
-  // the constructor the call to the gradient checker segfaults.
-  this->blob_top_vec_.push_back(this->blob_top_data_);
-  layer.SetUp(this->blob_bottom_vec_, &(this->blob_top_vec_));
-  layer.Forward(this->blob_bottom_vec_, &(this->blob_top_vec_));
-  EXPECT_EQ(this->blob_top_vec_[0]->num(), 1);
-  EXPECT_EQ(this->blob_top_vec_[0]->channels(), 1);
-  EXPECT_EQ(this->blob_top_vec_[0]->height(), 1);
-  EXPECT_EQ(this->blob_top_vec_[0]->width(), 1);
+  shared_ptr<EuclideanLayer<TypeParam> > layer(
+  	new EuclideanLayer<TypeParam>(layer_param));
+  layer->SetUp(this->blob_bottom_vec_, &(this->blob_top_vec_));
+  layer->Forward(this->blob_bottom_vec_, &(this->blob_top_vec_));
   TypeParam sum = 0;
   for (int n = 0; n < 10; ++n) {
     for (int c = 0; c < 5; ++c) {
@@ -125,6 +104,24 @@ TYPED_TEST(EuclideanLayerTest, TestGPU) {
   }
   sum = sum / 10.0;
   EXPECT_LE(this->blob_top_vec_[0]->data_at(0, 0, 0, 0) - 1e-4, sum);
-  EXPECT_GE(this->blob_top_vec_[0]->data_at(0, 0, 0, 0) + 1e-4, sum);
+  EXPECT_GE(this->blob_top_vec_[0]->data_at(0, 0, 0, 0) + 1e-4, sum); 
+}
+
+TYPED_TEST(EuclideanLayerTest, TestGradientCPU) {
+  LayerParameter layer_param;
+  Caffe::set_mode(Caffe::CPU);
+  EuclideanLayer<TypeParam> layer(layer_param);
+  GradientChecker<TypeParam> checker(1e-2, 1e-2);
+  checker.CheckGradientExhaustive(layer, this->blob_bottom_vec_,
+      this->blob_top_vec_);
+}
+
+TYPED_TEST(EuclideanLayerTest, TestGradientGPU) {
+  LayerParameter layer_param;
+  Caffe::set_mode(Caffe::GPU);
+  EuclideanLayer<TypeParam> layer(layer_param);
+  GradientChecker<TypeParam> checker(1e-2, 1e-2);
+  checker.CheckGradientExhaustive(layer, this->blob_bottom_vec_,
+      this->blob_top_vec_);
 }
 }
