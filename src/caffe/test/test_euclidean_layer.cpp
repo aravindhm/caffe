@@ -54,7 +54,7 @@ TYPED_TEST(EuclideanLayerTest, TestSetUp) {
   shared_ptr<EuclideanLayer<TypeParam> > layer(
   	new EuclideanLayer<TypeParam>(layer_param));
   layer->SetUp(this->blob_bottom_vec_, &(this->blob_top_vec_));
-  EXPECT_EQ(this->blob_top_->num(), 1);
+  EXPECT_EQ(this->blob_top_->num(), 10);
   EXPECT_EQ(this->blob_top_->height(), 1);
   EXPECT_EQ(this->blob_top_->width(), 1);
   EXPECT_EQ(this->blob_top_->channels(), 1);
@@ -68,8 +68,8 @@ TYPED_TEST(EuclideanLayerTest, TestCPU) {
   	new EuclideanLayer<TypeParam>(layer_param));
   layer->SetUp(this->blob_bottom_vec_, &(this->blob_top_vec_));
   layer->Forward(this->blob_bottom_vec_, &(this->blob_top_vec_));
-  TypeParam sum = 0;
   for (int n = 0; n < 10; ++n) {
+    TypeParam sum = 0;
     for (int c = 0; c < 5; ++c) {
       for (int h = 0; h < 100; ++h) {
         for (int w = 0; w < 300; ++w) {
@@ -78,10 +78,9 @@ TYPED_TEST(EuclideanLayerTest, TestCPU) {
         }
       }
     }
+    EXPECT_LE(this->blob_top_vec_[0]->data_at(n, 0, 0, 0) - 1e-4, sum);
+    EXPECT_GE(this->blob_top_vec_[0]->data_at(n, 0, 0, 0) + 1e-4, sum); 
   }
-  sum = sum / 10.0;
-  EXPECT_LE(this->blob_top_vec_[0]->data_at(0, 0, 0, 0) - 1e-4, sum);
-  EXPECT_GE(this->blob_top_vec_[0]->data_at(0, 0, 0, 0) + 1e-4, sum); 
 }
 
 TYPED_TEST(EuclideanLayerTest, TestGPU) {
@@ -91,8 +90,8 @@ TYPED_TEST(EuclideanLayerTest, TestGPU) {
   	new EuclideanLayer<TypeParam>(layer_param));
   layer->SetUp(this->blob_bottom_vec_, &(this->blob_top_vec_));
   layer->Forward(this->blob_bottom_vec_, &(this->blob_top_vec_));
-  TypeParam sum = 0;
   for (int n = 0; n < 10; ++n) {
+    TypeParam sum = 0;
     for (int c = 0; c < 5; ++c) {
       for (int h = 0; h < 100; ++h) {
         for (int w = 0; w < 300; ++w) {
@@ -101,10 +100,9 @@ TYPED_TEST(EuclideanLayerTest, TestGPU) {
         }
       }
     }
+    EXPECT_LE(this->blob_top_vec_[0]->data_at(0, 0, 0, 0) - 1e-4, sum);
+    EXPECT_GE(this->blob_top_vec_[0]->data_at(0, 0, 0, 0) + 1e-4, sum); 
   }
-  sum = sum / 10.0;
-  EXPECT_LE(this->blob_top_vec_[0]->data_at(0, 0, 0, 0) - 1e-4, sum);
-  EXPECT_GE(this->blob_top_vec_[0]->data_at(0, 0, 0, 0) + 1e-4, sum); 
 }
 
 TYPED_TEST(EuclideanLayerTest, TestGradientCPU) {
