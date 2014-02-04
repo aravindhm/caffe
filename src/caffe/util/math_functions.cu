@@ -79,5 +79,29 @@ void caffe_gpu_sub<double>(const int N, const double* a,
   */
 }
 
+//The below unary operator will be used by thrust to compute the L1 norm.
+template<typename Dtype>
+struct abs
+{
+   __host__ __device__
+       Dtype operator()(const Dtype& x) const {
+          if(x >= 0.00000) return x;
+          else return -x;
+       }
+};
+
+template <>
+float caffe_gpu_l1norm<float>(const int N, const float* a) {
+   thrust::device_ptr<const float> dev_ptr_a(a);
+   return thrust::transform_reduce(dev_ptr_a, dev_ptr_a + N, 
+           abs<float>(), (float)0.0, thrust::plus<float>());
+}
+
+template <>
+double caffe_gpu_l1norm<double>(const int N, const double* a) {
+   thrust::device_ptr<const double> dev_ptr_a(a);
+   return thrust::transform_reduce(dev_ptr_a, dev_ptr_a + N, 
+           abs<double>(), (double)0.0, thrust::plus<double>());
+}
 
 }  // namespace caffe

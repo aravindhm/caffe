@@ -3,6 +3,7 @@
 #include <limits>
 //#include <mkl.h>
 #include <eigen3/Eigen/Dense>
+#include <eigen3/Eigen/Core>
 #include <boost/math/special_functions/next.hpp>
 #include <boost/random.hpp>
 
@@ -264,6 +265,28 @@ void caffe_sub<double>(const int n, const double* a, const double* b,
   CHECK(y);
   map_vector_double_t(y, n) = const_map_vector_double_t(a, n) -
       const_map_vector_double_t(b, n);
+}
+
+template <>
+float caffe_l1norm<float>(const int n, const float* a) {
+  CHECK_GE(n, 0);
+  CHECK(a);
+  float result = 0.0;
+  for(int i = 0; i < n; i++) {
+     result = result + fabs(a[i]);
+  }
+  return result;
+}
+
+template <>
+double caffe_l1norm<double>(const int n, const double* a) {
+  CHECK_GE(n, 0);
+  CHECK(a);
+  double result = 0.0;
+  for(int i = 0; i < n; i++) {
+     result = result + fabs(a[i]);
+  }
+  return result;
 }
 
 template <>

@@ -82,7 +82,7 @@ COMMON_FLAGS := -DNDEBUG -O2 $(foreach includedir,$(INCLUDE_DIRS),-I$(includedir
 CXXFLAGS += -pthread -fPIC $(COMMON_FLAGS) -fopenmp
 NVCCFLAGS := -ccbin=$(CXX) -Xcompiler -fPIC $(COMMON_FLAGS)
 LDFLAGS += $(foreach librarydir,$(LIBRARY_DIRS),-L$(librarydir)) \
-		$(foreach library,$(LIBRARIES),-l$(library)) -Wl,-rpath=/usr/lib/atlas-base
+		$(foreach library,$(LIBRARIES),-l$(library)) -Wl,-rpath=/usr/lib/atlas-base -fopenmp
 PYTHON_LDFLAGS := $(LDFLAGS) $(foreach library,$(PYTHON_LIBRARIES),-l$(library))
 
 
