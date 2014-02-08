@@ -20,6 +20,7 @@
 #include "caffe/proto/caffe.pb.h"
 
 using std::fstream;
+using std::ifstream;
 using std::ios;
 using std::max;
 using std::string;
@@ -97,6 +98,42 @@ bool ReadImageToDatum(const string& filename, const int label,
       for (int w = 0; w < cv_img.cols; ++w) {
         datum_string->push_back(static_cast<char>(cv_img.at<cv::Vec3b>(h, w)[c]));
       }
+    }
+  }
+  return true;
+}
+
+bool ReadCSVToDatum(const string& filename, const int label,
+     const int height, const int width, Datum* datum) {
+  ifstream fin;
+  fin.open(filename.c_str(), ifstream::in);
+  if(!fin.good()) {
+    LOG(ERROR) << "Could not open or find file " << filename;
+    return false;
+  }
+  //File open works. Let's initialize the datum
+  datum->set_channels(1);
+  datum->set_height(height);
+  datum->set_width(width);
+  datum->set_label(label);
+  datum->clear_data();
+  datum->clear_float_data();
+  //Now that the file is open read its contents into the datum float-data
+  float val;
+  char ch;
+  for(int i = 0; i < height; i++) {
+    for(int j = 0; j < width; j++) {
+      if(!fin.eof()) {
+         fin >> val;
+         if(j < width - 1) {
+           fin >> ch;
+         }
+      }
+      else {
+        LOG(ERROR) << "file too short" << filename;
+        return false;
+      }
+      datum->add_float_data(val);
     }
   }
   return true;

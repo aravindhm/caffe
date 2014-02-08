@@ -4,6 +4,12 @@
 #include "caffe/vision_layers.hpp"
 #include <algorithm>
 
+#include <iostream>
+
+#include <thrust/device_vector.h>
+#include <thrust/transform.h>
+#include <thrust/functional.h>
+
 using std::max;
 
 namespace caffe {
@@ -14,6 +20,7 @@ void ReLULayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   const Dtype* bottom_data = bottom[0]->cpu_data();
   Dtype* top_data = (*top)[0]->mutable_cpu_data();
   const int count = bottom[0]->count();
+  #pragma omp parallel for
   for (int i = 0; i < count; ++i) {
     top_data[i] = max(bottom_data[i], Dtype(0));
   }
@@ -28,6 +35,7 @@ Dtype ReLULayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     const Dtype* top_diff = top[0]->cpu_diff();
     Dtype* bottom_diff = (*bottom)[0]->mutable_cpu_diff();
     const int count = (*bottom)[0]->count();
+    #pragma omp parallel for
     for (int i = 0; i < count; ++i) {
       bottom_diff[i] = top_diff[i] * (bottom_data[i] > 0);
     }
@@ -44,14 +52,30 @@ __global__ void ReLUForward(const int n, const Dtype* in, Dtype* out) {
 }
 
 template <typename Dtype>
+struct relu_functor
+{
+    relu_functor() {}
+    __host__ __device__
+        Dtype operator()(const Dtype& x) const { 
+            if(x > 0) return x;
+            else return 0;
+        }
+};
+
+
+template <typename Dtype>
 void ReLULayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     vector<Blob<Dtype>*>* top) {
   const Dtype* bottom_data = bottom[0]->gpu_data();
   Dtype* top_data = (*top)[0]->mutable_gpu_data();
   const int count = bottom[0]->count();
-  ReLUForward<Dtype><<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS>>>(
+  thrust::device_ptr<const Dtype> dev_ptr_bottom_data(bottom_data);
+  thrust::device_ptr<Dtype> dev_ptr_top_data(top_data);
+  thrust::transform(dev_ptr_bottom_data, dev_ptr_bottom_data+count, dev_ptr_top_data, 
+       relu_functor<Dtype>());
+/*  ReLUForward<Dtype><<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS>>>(
       count, bottom_data, top_data);
-  CUDA_POST_KERNEL_CHECK;
+  CUDA_POST_KERNEL_CHECK; */
   // << " count: " << count << " bottom_data: "
   //     << (unsigned long)bottom_data << " top_data: " << (unsigned long)top_data
   //     << " blocks: " << CAFFE_GET_BLOCKS(count)
