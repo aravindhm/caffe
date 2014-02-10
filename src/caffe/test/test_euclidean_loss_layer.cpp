@@ -22,8 +22,8 @@ template <typename Dtype>
 class EuclideanLossLayerTest : public ::testing::Test {
  protected:
   EuclideanLossLayerTest()
-      : blob_bottom_data_(new Blob<Dtype>(10, 5, 1, 1)),
-        blob_bottom_label_(new Blob<Dtype>(10, 5, 1, 1)),
+      : blob_bottom_data_(new Blob<Dtype>(10, 5, 1, 10)),
+        blob_bottom_label_(new Blob<Dtype>(10, 5, 1, 10)),
         blob_top_(new Blob<Dtype>()) {
     // fill the values
     FillerParameter filler_param;
@@ -71,8 +71,8 @@ TYPED_TEST(EuclideanLossLayerTest, TestCPU) {
   TypeParam sum = 0;
   for (int n = 0; n < 10; ++n) {
     for (int c = 0; c < 5; ++c) {
-      for (int h = 0; h < 10; ++h) {
-        for (int w = 0; w < 300; ++w) {
+      for (int h = 0; h < 1; ++h) {
+        for (int w = 0; w < 10; ++w) {
           sum += pow((this->blob_bottom_vec_[0]->data_at(n,c,h,w) - 
                  this->blob_bottom_vec_[1]->data_at(n,c,h,w)), 2);
         }
@@ -94,8 +94,8 @@ TYPED_TEST(EuclideanLossLayerTest, TestGPU) {
   TypeParam sum = 0;
   for (int n = 0; n < 10; ++n) {
     for (int c = 0; c < 5; ++c) {
-      for (int h = 0; h < 10; ++h) {
-        for (int w = 0; w < 300; ++w) {
+      for (int h = 0; h < 1; ++h) {
+        for (int w = 0; w < 10; ++w) {
           sum += pow((this->blob_bottom_vec_[0]->data_at(n,c,h,w) - 
                  this->blob_bottom_vec_[1]->data_at(n,c,h,w)), 2);
         }
