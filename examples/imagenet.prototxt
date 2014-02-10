@@ -3,10 +3,10 @@ layers {
   layer {
     name: "data"
     type: "data"
-    source: "/home/jiayq/Data/ILSVRC12/train-leveldb"
-    meanfile: "/home/jiayq/Data/ILSVRC12/image_mean.binaryproto"
+    source: "/data/kitti/leveldb/kitti_train_t1_leveldb/"
+    meanfile: "/data/kitti/kitti_train_t1_mean.binaryproto"
     batchsize: 256
-    cropsize: 227
+    cropsize: 100
     mirror: true
   }
   top: "data"
