@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
   char key_cstr[100];
   leveldb::WriteBatch* batch = new leveldb::WriteBatch();
   for (int line_id = 0; line_id < lines.size(); ++line_id) {
-    if (!ReadImageToDatum(root_folder + lines[line_id].first, lines[line_id].second,
+    if (!ReadImageToDatum(root_folder + lines[line_id].first, lines[line_id].second, 0, 0,
         &datum)) {
       LOG(INFO) << "Failed to read " << lines[line_id].second;
       continue;
