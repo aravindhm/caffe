@@ -150,15 +150,6 @@ void FlowLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   // Copy the data
   memcpy((*top)[0]->mutable_cpu_data(), prefetch_data_->cpu_data(),
       sizeof(Dtype) * prefetch_data_->count());
-/*  const Dtype* top_data = (*top)[0]->cpu_data();
-  int height = (*top)[0]->height();
-  int width = (*top)[0]->width();
-  for(int i = 0; i < height; i++) {
-    for(int j = 0; j < width; j++) {
-      std::cout << top_data[i*width + j] << ",";
-    }
-    std::cout << std::endl;
-  }*/
   // Start a new prefetch thread
   CHECK(!pthread_create(&thread_, NULL, FlowLayerPrefetch<Dtype>,
       reinterpret_cast<void*>(this))) << "Pthread execution failed.";
