@@ -38,6 +38,13 @@ message FillerParameter {
   optional float std = 6 [default = 1]; // the std value in gaussian filler
 }
 
+message RegularizerParameter {  
+  // The regularizer type
+  optional string type = 1 [default = 'features_l1']; 
+  // the scale to use when adding the regularization to the objective function
+  optional float scale = 2 [default = 1]; 
+}
+
 message LayerParameter {
   optional string name = 1; // the layer name
   optional string type = 2; // the string to specify the layer type

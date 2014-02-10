@@ -151,6 +151,10 @@ $(BUILD_DIR)/src/$(PROJECT)/layers/%.o: src/$(PROJECT)/layers/%.cpp
 	$(CXX) $< $(CXXFLAGS) -c -o $@ $(LDFLAGS)
 	@echo
 
+$(BUILD_DIR)/src/$(PROJECT)/regularizers/%.o: src/$(PROJECT)/regularizers/%.cpp
+	$(CXX) $< $(CXXFLAGS) -c -o $@ $(LDFLAGS)
+	@echo
+
 $(BUILD_DIR)/src/$(PROJECT)/proto/%.o: src/$(PROJECT)/proto/%.cc
 	$(CXX) $< $(CXXFLAGS) -c -o $@ $(LDFLAGS)
 	@echo
@@ -168,6 +172,10 @@ $(BUILD_DIR)/src/gtest/%.o: src/gtest/%.cpp
 	@echo
 
 $(BUILD_DIR)/src/$(PROJECT)/layers/%.cuo: src/$(PROJECT)/layers/%.cu
+	$(CUDA_DIR)/bin/nvcc $(NVCCFLAGS) $(CUDA_ARCH) -c $< -o $@
+	@echo
+
+$(BUILD_DIR)/src/$(PROJECT)/regularizers/%.cuo: src/$(PROJECT)/regularizers/%.cu
 	$(CUDA_DIR)/bin/nvcc $(NVCCFLAGS) $(CUDA_ARCH) -c $< -o $@
 	@echo
 
