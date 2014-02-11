@@ -17,13 +17,7 @@ namespace caffe {
 template <typename Dtype>
 Regularizer<Dtype>* GetRegularizer(const RegularizerParameter& param) {
   const std::string& type = param.type();
-  if (type == "features_l1") {
-    return new FeatureL1Regularizer<Dtype>(param);
-/*  } else if (type == "weights_l1") {
-    return new WeightL1Regularizer<Dtype>(param);*/
-  } else {
-    LOG(FATAL) << "Unknown regularizer name: " << type;
-  }
+  LOG(FATAL) << "Unknown regularizer name: " << type;
   // just to suppress old compiler warnings.
   return (Regularizer<Dtype>*)(NULL);
 }

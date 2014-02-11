@@ -13,18 +13,19 @@
 
 namespace caffe {
 
+/*
 template <typename Dtype>
-class FeatureL1Regularizer : public Regularizer<Dtype> {
+class FeaturesL1Regularizer : public Regularizer<Dtype> {
   public: 
-    explicit FeatureL1Regularizer(const RegularizerParameter& param) 
+    explicit FeaturesL1Regularizer(const RegularizerParameter& param) 
       : Regularizer<Dtype>(param) {}
   protected: 
     virtual Dtype Regularize_cpu(vector<shared_ptr<Blob<Dtype> > >& blobs, 
        const bool propagate_down, 
        vector<Blob<Dtype>*>* bottom,
        const vector<Blob<Dtype>*>& top);
-}; // class FeatureL1Regularizer
-
+}; // class FeaturesL1Regularizer
+*/
 } //namespace caffe
 
 #endif
