@@ -93,25 +93,33 @@ void GradientChecker<Dtype>::CheckGradientSingle(Layer<Dtype>& layer,
       Caffe::set_random_seed(seed_);
       layer.Forward(bottom, &top);
       Dtype computed_objective = GetObjAndGradient(top, top_id, top_data_id);
+//       LOG(ERROR) << "computed_objective " << computed_objective;
       // Get any additional loss from the layer
       computed_objective += layer.Backward(top, true, &bottom);
+//      LOG(ERROR) << "computed_objective " << computed_objective;
       Dtype computed_gradient = current_blob->cpu_diff()[feat_id];
+//      LOG(ERROR) << "computed_gradient " << computed_gradient;
       // compute score by adding stepsize
       current_blob->mutable_cpu_data()[feat_id] += stepsize_;
       Caffe::set_random_seed(seed_);
       layer.Forward(bottom, &top);
       Dtype positive_objective = GetObjAndGradient(top, top_id, top_data_id);
+//      LOG(ERROR) << "positive_objective " << positive_objective;
       positive_objective += layer.Backward(top, true, &bottom);
+//      LOG(ERROR) << "positive_objective " << positive_objective;
       // compute score by subtracting stepsize
       current_blob->mutable_cpu_data()[feat_id] -= stepsize_ * 2;
       Caffe::set_random_seed(seed_);
       layer.Forward(bottom, &top);
       Dtype negative_objective = GetObjAndGradient(top, top_id, top_data_id);
+//      LOG(ERROR) << "negative_objective " << negative_objective;
       negative_objective += layer.Backward(top, true, &bottom);
+//      LOG(ERROR) << "negative_objective " << negative_objective;
       // Recover stepsize
       current_blob->mutable_cpu_data()[feat_id] += stepsize_;
       Dtype estimated_gradient = (positive_objective - negative_objective) /
           stepsize_ / 2.;
+//      LOG(ERROR) << "estimated_gradient " << negative_objective;
       Dtype feature = current_blob->cpu_data()[feat_id];
       // LOG(ERROR) << "debug: " << current_blob->cpu_data()[feat_id] << " "
       //     << current_blob->cpu_diff()[feat_id];
