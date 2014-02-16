@@ -173,6 +173,78 @@ Dtype EuclideanLossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
 }
 
 template <typename Dtype>
+void L1NormLossLayer<Dtype>::SetUp(
+  const vector<Blob<Dtype>*>& bottom, vector<Blob<Dtype>*>* top) {
+  CHECK_EQ(bottom.size(), 1) << "Loss Layer takes one blob as input.";
+  CHECK_LE(top->size(), 1) << "Loss Layer atmost one output.";
+  if(top->size() == 1) {
+    (*top)[0]->Reshape(1, 1, 1, 1); 
+  }
+}
+
+
+template <typename Dtype>
+void L1NormLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+    vector<Blob<Dtype>*>* top) {
+    if(top->size() == 1) {
+      int count = bottom[0]->count();
+      int num = bottom[0]->num();
+      const Dtype* bottom_data = bottom[0]->cpu_data();
+      Dtype loss = caffe_l1norm(count, bottom_data);
+      ((Dtype*)(*top)[0]->mutable_cpu_data())[0] = loss / num;
+    }
+}
+
+template <typename Dtype>
+void L1NormLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+    vector<Blob<Dtype>*>* top) {
+    if(top->size() == 1) {
+      int count = bottom[0]->count();
+      int num = bottom[0]->num();
+      const Dtype* bottom_data = bottom[0]->cpu_data();
+      Dtype loss =  caffe_gpu_l1norm(count, bottom_data);
+      ((Dtype*)(*top)[0]->mutable_cpu_data())[0] = loss / num;
+    }
+}
+
+template <typename Dtype>
+Dtype L1NormLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
+    const bool propagate_down, vector<Blob<Dtype>*>* bottom) {
+
+  int count = (*bottom)[0]->count();
+  int num = (*bottom)[0]->num();
+  const Dtype* bottom_data = (*bottom)[0]->cpu_data();
+
+  if(propagate_down) {
+     Dtype* bottom_diff = (*bottom)[0]->mutable_cpu_diff();
+     memset(bottom_diff, 0, count*sizeof(Dtype));
+     for(int i = 0; i < count; i++) {
+        if(bottom_data[i] > 0) bottom_diff[i] = 1.0/num;
+        else if(bottom_data[i] < 0) bottom_diff[i] = -1.0/num;
+     }
+  }
+  return caffe_l1norm(count, bottom_data);
+}
+/*
+template <typename Dtype>
+Dtype L1NormLossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
+    const bool propagate_down, vector<Blob<Dtype>*>* bottom) {
+  int count = (*bottom)[0]->count();
+  int num = (*bottom)[0]->num();
+  caffe_gpu_sub(count, (*bottom)[0]->gpu_data(), (*bottom)[1]->gpu_data(),
+      difference_.mutable_gpu_data());
+  Dtype loss;
+  caffe_gpu_dot(
+      count, difference_.gpu_data(), difference_.gpu_data(), &loss);
+  loss = loss / num / Dtype(2);
+  // Compute the gradient
+  caffe_gpu_axpby(count, Dtype(1) / num, difference_.gpu_data(), Dtype(0),
+      (*bottom)[0]->mutable_gpu_diff());
+  return loss;
+}*/
+
+
+template <typename Dtype>
 void AccuracyLayer<Dtype>::SetUp(
   const vector<Blob<Dtype>*>& bottom, vector<Blob<Dtype>*>* top) {
   CHECK_EQ(bottom.size(), 2) << "Accuracy Layer takes two blobs as input.";

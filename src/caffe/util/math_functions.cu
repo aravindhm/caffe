@@ -1,6 +1,6 @@
 // Copyright 2013 Yangqing Jia
 
-#include <cmath>
+#include <math.h>
 #include <cstdlib>
 #include <cstring>
 
@@ -85,8 +85,7 @@ struct abs
 {
    __host__ __device__
        Dtype operator()(const Dtype& x) const {
-          if(x >= 0.00000) return x;
-          else return -x;
+           return std::abs(x);
        }
 };
 

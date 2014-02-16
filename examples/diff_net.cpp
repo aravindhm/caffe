@@ -1,10 +1,10 @@
-// Copyright 2013 Yangqing Jia
+// Copyright 2013 Aravindh Mahendran
 //
 // This is a simple script that allows one to quickly test a network whose
 // structure is specified by text format protocol buffers, and whose parameter
 // are loaded from a pre-trained network.
 // Usage:
-//    view_net net_proto pretrained_net_proto [CPU/GPU]
+//    diff_net net_proto pretrained_net_proto1 pretrained_net_proto2 [CPU/GPU]
 
 #include <cuda_runtime.h>
 

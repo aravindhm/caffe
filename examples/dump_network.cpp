@@ -1,4 +1,4 @@
-// Copyright 2013 Yangqing Jia
+// Copyright 2013 Aravindh Mahendran
 //
 // This program takes in a trained network and an input blob, and then dumps
 // all the intermediate blobs produced by the net to individual binary

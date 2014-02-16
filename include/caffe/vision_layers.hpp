@@ -525,6 +525,27 @@ class EuclideanLossLayer : public Layer<Dtype> {
   Blob<Dtype> difference_;
 };
 
+template <typename Dtype>
+class L1NormLossLayer : public Layer<Dtype> {
+ public:
+  explicit L1NormLossLayer(const LayerParameter& param)
+      : Layer<Dtype>(param) {}
+  virtual void SetUp(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+
+ protected:
+  // The loss layer will do nothing during forward - all computation are
+  // carried out in the backward pass.
+  virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+  virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+  virtual Dtype Backward_cpu(const vector<Blob<Dtype>*>& top,
+      const bool propagate_down, vector<Blob<Dtype>*>* bottom);
+  virtual Dtype Backward_gpu(const vector<Blob<Dtype>*>& top,
+       const bool propagate_down, vector<Blob<Dtype>*>* bottom);
+};
+
 // A layer type similar to the euclidean loss above, but 
 // different in that it is also computing the loss and
 //  passing it forward. This can be used as a regularizer also.

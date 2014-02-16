@@ -11,6 +11,8 @@
 #include "caffe/common.hpp"
 #include "caffe/util/math_functions.hpp"
 
+#include <math.h>
+
 namespace caffe {
 
 // Operations on aligned memory are faster than on unaligned memory.
@@ -271,9 +273,9 @@ template <>
 float caffe_l1norm<float>(const int n, const float* a) {
   CHECK_GE(n, 0);
   CHECK(a);
-  float result = 0.0;
+  float result = 0.0f;
   for(int i = 0; i < n; i++) {
-     result = result + fabs(a[i]);
+     result = result + std::abs(a[i]);
   }
   return result;
 }
@@ -282,9 +284,9 @@ template <>
 double caffe_l1norm<double>(const int n, const double* a) {
   CHECK_GE(n, 0);
   CHECK(a);
-  double result = 0.0;
+  double result = 0.0F;
   for(int i = 0; i < n; i++) {
-     result = result + fabs(a[i]);
+     result = result + std::abs(a[i]);
   }
   return result;
 }
