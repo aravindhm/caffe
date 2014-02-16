@@ -173,6 +173,49 @@ Dtype EuclideanLossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
 }
 
 template <typename Dtype>
+void AccuracyLayer<Dtype>::SetUp(
+  const vector<Blob<Dtype>*>& bottom, vector<Blob<Dtype>*>* top) {
+  CHECK_EQ(bottom.size(), 2) << "Accuracy Layer takes two blobs as input.";
+  CHECK_EQ(top->size(), 1) << "Accuracy Layer takes 1 output.";
+  CHECK_EQ(bottom[0]->num(), bottom[1]->num())
+      << "The data and label should have the same number.";
+  CHECK_EQ(bottom[1]->channels(), 1);
+  CHECK_EQ(bottom[1]->height(), 1);
+  CHECK_EQ(bottom[1]->width(), 1);
+  (*top)[0]->Reshape(1, 2, 1, 1);
+}
+
+template <typename Dtype>
+void AccuracyLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+    vector<Blob<Dtype>*>* top) {
+  Dtype accuracy = 0;
+  Dtype logprob = 0;
+  const Dtype* bottom_data = bottom[0]->cpu_data();
+  const Dtype* bottom_label = bottom[1]->cpu_data();
+  int num = bottom[0]->num();
+  int dim = bottom[0]->count() / bottom[0]->num();
+  for (int i = 0; i < num; ++i) {
+    // Accuracy
+    Dtype maxval = -FLT_MAX;
+    int max_id = 0;
+    for (int j = 0; j < dim; ++j) {
+      if (bottom_data[i * dim + j] > maxval) {
+        maxval = bottom_data[i * dim + j];
+        max_id = j;
+      }
+    }
+    if (max_id == (int)bottom_label[i]) {
+      ++accuracy;
+    }
+    Dtype prob = max(bottom_data[i * dim + (int)bottom_label[i]], kLOG_THRESHOLD);
+    logprob -= log(prob);
+  }
+  // LOG(INFO) << "Accuracy: " << accuracy;
+  (*top)[0]->mutable_cpu_data()[0] = accuracy / num;
+  (*top)[0]->mutable_cpu_data()[1] = logprob / num;
+}
+
+template <typename Dtype>
 void L1NormLossLayer<Dtype>::SetUp(
   const vector<Blob<Dtype>*>& bottom, vector<Blob<Dtype>*>* top) {
   CHECK_EQ(bottom.size(), 1) << "Loss Layer takes one blob as input.";
@@ -225,71 +268,12 @@ Dtype L1NormLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   }
   return caffe_l1norm(count, bottom_data);
 }
-/*
-template <typename Dtype>
-Dtype L1NormLossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
-    const bool propagate_down, vector<Blob<Dtype>*>* bottom) {
-  int count = (*bottom)[0]->count();
-  int num = (*bottom)[0]->num();
-  caffe_gpu_sub(count, (*bottom)[0]->gpu_data(), (*bottom)[1]->gpu_data(),
-      difference_.mutable_gpu_data());
-  Dtype loss;
-  caffe_gpu_dot(
-      count, difference_.gpu_data(), difference_.gpu_data(), &loss);
-  loss = loss / num / Dtype(2);
-  // Compute the gradient
-  caffe_gpu_axpby(count, Dtype(1) / num, difference_.gpu_data(), Dtype(0),
-      (*bottom)[0]->mutable_gpu_diff());
-  return loss;
-}*/
 
-
-template <typename Dtype>
-void AccuracyLayer<Dtype>::SetUp(
-  const vector<Blob<Dtype>*>& bottom, vector<Blob<Dtype>*>* top) {
-  CHECK_EQ(bottom.size(), 2) << "Accuracy Layer takes two blobs as input.";
-  CHECK_EQ(top->size(), 1) << "Accuracy Layer takes 1 output.";
-  CHECK_EQ(bottom[0]->num(), bottom[1]->num())
-      << "The data and label should have the same number.";
-  CHECK_EQ(bottom[1]->channels(), 1);
-  CHECK_EQ(bottom[1]->height(), 1);
-  CHECK_EQ(bottom[1]->width(), 1);
-  (*top)[0]->Reshape(1, 2, 1, 1);
-}
-
-template <typename Dtype>
-void AccuracyLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
-    vector<Blob<Dtype>*>* top) {
-  Dtype accuracy = 0;
-  Dtype logprob = 0;
-  const Dtype* bottom_data = bottom[0]->cpu_data();
-  const Dtype* bottom_label = bottom[1]->cpu_data();
-  int num = bottom[0]->num();
-  int dim = bottom[0]->count() / bottom[0]->num();
-  for (int i = 0; i < num; ++i) {
-    // Accuracy
-    Dtype maxval = -FLT_MAX;
-    int max_id = 0;
-    for (int j = 0; j < dim; ++j) {
-      if (bottom_data[i * dim + j] > maxval) {
-        maxval = bottom_data[i * dim + j];
-        max_id = j;
-      }
-    }
-    if (max_id == (int)bottom_label[i]) {
-      ++accuracy;
-    }
-    Dtype prob = max(bottom_data[i * dim + (int)bottom_label[i]], kLOG_THRESHOLD);
-    logprob -= log(prob);
-  }
-  // LOG(INFO) << "Accuracy: " << accuracy;
-  (*top)[0]->mutable_cpu_data()[0] = accuracy / num;
-  (*top)[0]->mutable_cpu_data()[1] = logprob / num;
-}
 
 INSTANTIATE_CLASS(MultinomialLogisticLossLayer);
 INSTANTIATE_CLASS(InfogainLossLayer);
 INSTANTIATE_CLASS(EuclideanLossLayer);
 INSTANTIATE_CLASS(AccuracyLayer);
+INSTANTIATE_CLASS(L1NormLossLayer);
 
 }  // namespace caffe
