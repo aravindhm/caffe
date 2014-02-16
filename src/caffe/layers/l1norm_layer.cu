@@ -63,20 +63,10 @@ Dtype L1NormLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     Dtype* bottom_diff = (*bottom)[0]->mutable_cpu_diff();
     memset(bottom_diff, 0, count*sizeof(Dtype));
     const Dtype* bottom_data = (*bottom)[0]->cpu_data();
-    for(int i = 0; i < num; i++) {
-#pragma omp parallel for
-       for(int j = 0; j < (count/num); j++) {
-          if(bottom_data[i*(count/num) + j] > 0) {
-              bottom_diff[j] += 1;
-          }
-          else if(bottom_data[i*(count/num) + j] < 0) { 
-              bottom_diff[j] += -1;
-          }
-       }
-    }
-#pragma omp parallel for
-    for(int j = 0; j < (count/num); j++) {
-        bottom_diff[j] /= num;
+    
+    for(int i = 0; i < count; i++) {
+        if(bottom_data[i] > 0) bottom_diff[i] = 1.0;
+        else if(bottom_data[i] < 0) bottom_diff[i] = -1.0;
     }
   }
   return Dtype(0);
