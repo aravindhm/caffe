@@ -78,6 +78,11 @@ message LayerParameter {
   // For data layers, specify if we want to randomly mirror data.
   optional bool mirror = 21 [default = false];
 
+  // Parameters for cropping layers
+  optional int32 cropx = 22 [default = 1]; //The crop start x position
+  optional int32 cropy = 23 [default = 1]; //The crop start y position
+  optional int32 crop_width = 24 [default = 1]; //The crop width
+  optional int32 crop_height = 25 [default = 1]; //The crop height
   // The blobs containing the numeric parameters of the layer
   repeated BlobProto blobs = 50;
   // The ratio that is multiplied on the global learning rate. If you want to set
