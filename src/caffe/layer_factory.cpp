@@ -43,6 +43,8 @@ Layer<Dtype>* GetLayer(const LayerParameter& param) {
     return new LRNLayer<Dtype>(param);
   } else if (type == "padding") {
     return new PaddingLayer<Dtype>(param);
+  } else if (type == "cropping") {
+    return new CroppingLayer<Dtype>(param);
   } else if (type == "pool") {
     return new PoolingLayer<Dtype>(param);
   } else if (type == "regularizer_as_loss") {
