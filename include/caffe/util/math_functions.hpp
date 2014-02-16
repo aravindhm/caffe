@@ -114,6 +114,10 @@ Dtype caffe_cpu_dot(const int n, const Dtype* x, const Dtype* y);
 template <typename Dtype>
 void caffe_gpu_dot(const int n, const Dtype* x, const Dtype* y, Dtype* out);
 
+// Returns the sum of the absolute values of the elements of vector x
+template <typename Dtype>
+void caffe_gpu_asum(const int n, const Dtype* x, Dtype* y);
+
 }  // namespace caffe
 
 

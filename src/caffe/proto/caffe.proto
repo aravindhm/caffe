@@ -91,6 +91,16 @@ message LayerParameter {
   // point would be set as rand_skip * rand(0,1). Note that rand_skip should not
   // be larger than the number of keys in the leveldb.
   optional uint32 rand_skip = 53 [ default = 0 ];
+  
+  // Weight regularizer type  
+  enum RegularizerType {
+    L1 = 0;
+    L2 = 1;
+    MAX_NORM = 2; // not fully implemented yet
+  }
+  optional RegularizerType regularizer = 60;
+  // Coefficent controls how strong to regularize
+  optional float regularizer_coeff = 61; 
 }
 
 message LayerConnection {
