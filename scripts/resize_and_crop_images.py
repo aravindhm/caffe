@@ -28,12 +28,14 @@ class OpenCVResizeCrop:
             new_height = output_side_length * height / width
         else:
             new_width = output_side_length * width / height
-        resized_img = cv2.resize(img, (new_width, new_height))
-        height_offset = (new_height - output_side_length) / 2
-        width_offset = (new_width - output_side_length) / 2
-        cropped_img = resized_img[height_offset:height_offset + output_side_length,
-                                  width_offset:width_offset + output_side_length]
-        cv2.imwrite(output_file, cropped_img)
+        #resized_img = cv2.resize(img, (new_width, new_height))
+        resized_img = cv2.resize(img, (1254, 372))
+        #height_offset = (new_height - output_side_length) / 2
+        #width_offset = (new_width - output_side_length) / 2
+        #cropped_img = resized_img[height_offset:height_offset + output_side_length,
+        #                          width_offset:width_offset + output_side_length]
+        #cv2.imwrite(output_file, cropped_img)
+        cv2.imwrite(output_file, resized_img)
 
 class PILResizeCrop:
 ## http://united-coders.com/christian-harms/image-resizing-tips-every-coder-should-know/

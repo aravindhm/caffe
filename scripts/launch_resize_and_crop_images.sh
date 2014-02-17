@@ -18,7 +18,8 @@
 # input: the file containing one image path relative to input_folder each line
 # input_folder: where are the original images
 # output_folder: where to save the resized and cropped images
-./resize_and_crop_images.py --num_clients=8 --image_lib=opencv --input=/home/user/Datasets/ImageNet/ILSVRC2010/ILSVRC2010_images.txt --input_folder=/home/user/Datasets/ImageNet/ILSVRC2010/ILSVRC2010_images_train/ --output_folder=/home/user/Datasets/ImageNet/ILSVRC2010/ILSVRC2010_images_train_resized/
+#./resize_and_crop_images.py --num_clients=8 --image_lib=opencv --input=/home/user/Datasets/ImageNet/ILSVRC2010/ILSVRC2010_images.txt --input_folder=/home/user/Datasets/ImageNet/ILSVRC2010/ILSVRC2010_images_train/ --output_folder=/home/user/Datasets/ImageNet/ILSVRC2010/ILSVRC2010_images_train_resized/
+./resize_and_crop_images.py --num_clients=8 --image_lib=opencv --input=/data/kitti/imagelists/kitti_t1_imagelist.txt --input_folder=// --output_folder=/data/kitti/sequences_resized/
 
 ## Launch your Mapreduce with MPI
 # mpirun -n 8 --launch=mpi resize_and_crop_images.py --image_lib=opencv --input=/home/user/Datasets/ImageNet/ILSVRC2010/ILSVRC2010_images.txt --input_folder=/home/user/Datasets/ImageNet/ILSVRC2010/ILSVRC2010_images_train/ --output_folder=/home/user/Datasets/ImageNet/ILSVRC2010/ILSVRC2010_images_train_resized/
