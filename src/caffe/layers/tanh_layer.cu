@@ -12,6 +12,16 @@ void TanHLayer<Dtype>::SetUp(
     const vector<Blob<Dtype>*>& bottom, vector<Blob<Dtype>*>* top) {
   CHECK_EQ(bottom.size(), 1) << "tanh layer takes one blob as input.";
   CHECK_EQ(top->size(), 1) << "tanh Layer takes one blob as output.";
+  if((*top)[0]->count() == 0) {
+     //We should allocate memory
+     (*top)[0]->Reshape(bottom[0]->num(), bottom[0]->channels(), bottom[0]->height(), bottom[0]->width());
+  }
+  else { // its either in place or someone has allocated memory already
+     CHECK_EQ(bottom[0]->num(), (*top)[0]->num());
+     CHECK_EQ(bottom[0]->channels(), (*top)[0]->channels());
+     CHECK_EQ(bottom[0]->height(), (*top)[0]->height());
+     CHECK_EQ(bottom[0]->width(), (*top)[0]->width());
+  }
 };
 
 template <typename Dtype>
