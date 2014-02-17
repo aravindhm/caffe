@@ -4,13 +4,13 @@ layers {
     name: "data"
     type: "data"
     source: "/data/kitti/leveldb/kitti_t1_leveldb/"
-    meanfile: "/data/kitti/leveldb/image_mean.binaryproto"
     batchsize: 256
     cropsize: 227
     mirror: true
     scale: 0.003921569
   }
   top: "data"
+  top: "label"
 }
 layers {
   layer {
@@ -37,8 +37,8 @@ layers {
 }
 layers {
   layer {
-    name: "sigmoid1"
-    type: "sigmoid"
+    name: "tanh1"
+    type: "tanh"
   }
   bottom: "conv1"
   top: "conv1"

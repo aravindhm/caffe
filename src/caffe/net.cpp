@@ -71,7 +71,7 @@ void Net<Dtype>::Init(const NetParameter& param) {
       const int blob_id = blob_name_to_idx[blob_name];
       if (available_blobs.find(blob_name) == available_blobs.end()) {
         LOG(FATAL) << "Unknown blob input " << blob_name <<
-            " to layer" << j;
+            " to layer" << i;
       }
       LOG(INFO) << layer_param.name() << " <- " << blob_name;
       bottom_vecs_[i].push_back(
