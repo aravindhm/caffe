@@ -8,6 +8,13 @@
 namespace caffe {
 
 template <typename Dtype>
+void TanHLayer<Dtype>::SetUp(
+    const vector<Blob<Dtype>*>& bottom, vector<Blob<Dtype>*>* top) {
+  CHECK_EQ(bottom.size(), 1) << "tanh layer takes one blob as input.";
+  CHECK_EQ(top->size(), 1) << "tanh Layer takes one blob as output.";
+};
+
+template <typename Dtype>
 void TanHLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     vector<Blob<Dtype>*>* top) {
   const Dtype* bottom_data = bottom[0]->cpu_data();
