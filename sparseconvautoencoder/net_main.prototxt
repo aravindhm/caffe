@@ -4,7 +4,7 @@ layers {
     name: "data"
     type: "data"
     source: "/data/kitti/leveldb/kitti_t1_leveldb/"
-    batchsize: 256
+    batchsize: 32
     cropsize: 227
     mirror: true
     scale: 0.003921569
@@ -41,7 +41,7 @@ layers {
     type: "tanh"
   }
   bottom: "conv1"
-  top: "conv1"
+  top: "conv1_tanh"
 }
 layers {
   layer {
@@ -50,7 +50,7 @@ layers {
     regularizer: L1
     regularizer_coeff: 1.
   }
-  bottom: "conv1"
+  bottom: "conv1_tanh"
 }
 layers {
   layer {
@@ -72,7 +72,7 @@ layers {
     weight_decay: 1.
     weight_decay: 0.
   }
-  bottom: "conv1"
+  bottom: "conv1_tanh"
   top: "data_reconstructed"
 }
 layers {
@@ -81,8 +81,8 @@ layers {
     type: "cropping"
     cropx: 8
     cropy: 8
-    crop_width: 100
-    crop_height: 100
+    crop_width: 213
+    crop_height: 213
   }
   bottom: "data"
   top: "data_cropped"
