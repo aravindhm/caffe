@@ -28,6 +28,8 @@ GTEST_SRC := src/gtest/gtest-all.cpp
 TEST_HDRS := $(shell find src/$(PROJECT) -name "test_*.hpp")
 # EXAMPLE_SRCS are the source files for the example binaries
 EXAMPLE_SRCS := $(shell find examples -name "*.cpp")
+# VISUALIZER_SRCS are the source files for the visualizer binaries
+VISUALIZER_SRCS := $(shell find visualizers -name "*.cpp")
 # PROTO_SRCS are the protocol buffer definitions
 PROTO_SRCS := $(wildcard src/$(PROJECT)/proto/*.proto)
 # PY$(PROJECT)_SRC is the python wrapper for $(PROJECT)
@@ -53,10 +55,12 @@ PROTO_OBJS := $(addprefix $(BUILD_DIR)/, ${PROTO_GEN_CC:.cc=.o})
 OBJS := $(PROTO_OBJS) $(CXX_OBJS) $(CU_OBJS)
 # program and test objects
 EXAMPLE_OBJS := $(addprefix $(BUILD_DIR)/, ${EXAMPLE_SRCS:.cpp=.o})
+VISUALIZER_OBJS := $(addprefix $(BUILD_DIR)/, ${VISUALIZER_SRCS:.cpp=.o})
 TEST_OBJS := $(addprefix $(BUILD_DIR)/, ${TEST_SRCS:.cpp=.o})
 GTEST_OBJ := $(addprefix $(BUILD_DIR)/, ${GTEST_SRC:.cpp=.o})
 # program and test bins
 EXAMPLE_BINS := ${EXAMPLE_OBJS:.o=.bin}
+VISUALIZER_BINS := ${VISUALIZER_OBJS:.o=.bin}
 TEST_BINS := ${TEST_OBJS:.o=.testbin}
 
 ##############################
@@ -103,6 +107,7 @@ all: init $(NAME) $(STATIC_NAME) examples
 init:
 	@ mkdir -p $(foreach obj,$(OBJS),$(dir $(obj)))
 	@ mkdir -p $(foreach obj,$(EXAMPLE_OBJS),$(dir $(obj)))
+	@ mkdir -p $(foreach obj,$(VISUALIZER_OBJS),$(dir $(obj)))
 	@ mkdir -p $(foreach obj,$(TEST_OBJS),$(dir $(obj)))
 	@ mkdir -p $(foreach obj,$(GTEST_OBJ),$(dir $(obj)))
 
@@ -112,6 +117,8 @@ linecount: clean
 test: init $(TEST_BINS)
 
 examples: init $(EXAMPLE_BINS)
+
+visualizers: init $(VISUALIZER_BINS)
 
 py$(PROJECT): py
 
@@ -144,6 +151,10 @@ $(TEST_BINS): %.testbin : %.o $(GTEST_OBJ) $(STATIC_NAME) $(TEST_HDRS)
 	$(CXX) $< $(GTEST_OBJ) $(STATIC_NAME) -o $@ $(CXXFLAGS) $(LDFLAGS) $(WARNINGS)
 
 $(EXAMPLE_BINS): %.bin : %.o $(STATIC_NAME)
+	$(CXX) $< $(STATIC_NAME) -o $@ $(CXXFLAGS) $(LDFLAGS) $(WARNINGS)
+	@echo
+
+$(VISUALIZER_BINS): %.bin : %.o $(STATIC_NAME)
 	$(CXX) $< $(STATIC_NAME) -o $@ $(CXXFLAGS) $(LDFLAGS) $(WARNINGS)
 	@echo
 
@@ -182,6 +193,10 @@ $(BUILD_DIR)/src/$(PROJECT)/util/%.cuo: src/$(PROJECT)/util/%.cu
 	@echo
 
 $(BUILD_DIR)/examples/%.o: examples/%.cpp
+	$(CXX) $< $(CXXFLAGS) -c -o $@ $(LDFLAGS)
+	@echo
+
+$(BUILD_DIR)/visualizers/%.o: visualizers/%.cpp
 	$(CXX) $< $(CXXFLAGS) -c -o $@ $(LDFLAGS)
 	@echo
 
