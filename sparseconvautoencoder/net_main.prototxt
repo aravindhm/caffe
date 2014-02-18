@@ -92,6 +92,7 @@ layers {
   layer {
      name: "reconstruction_error1"
      type: "euclidean_loss"
+     scale: 0.004695
   }
   bottom: "data_cropped"
   bottom: "data_reconstructed"

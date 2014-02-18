@@ -512,7 +512,9 @@ template <typename Dtype>
 class EuclideanLossLayer : public Layer<Dtype> {
  public:
   explicit EuclideanLossLayer(const LayerParameter& param)
-      : Layer<Dtype>(param), difference_() {}
+      : Layer<Dtype>(param), difference_() {
+    scale_ = param.scale();
+  }
   virtual void SetUp(const vector<Blob<Dtype>*>& bottom,
       vector<Blob<Dtype>*>* top);
 
@@ -528,6 +530,7 @@ class EuclideanLossLayer : public Layer<Dtype> {
   // virtual Dtype Backward_gpu(const vector<Blob<Dtype>*>& top,
   //     const bool propagate_down, vector<Blob<Dtype>*>* bottom);
   Blob<Dtype> difference_;
+  Dtype scale_;
 };
 
 // The most natural places should the Regularizer subclasses

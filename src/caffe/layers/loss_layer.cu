@@ -120,7 +120,7 @@ void EuclideanLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       caffe_sub(count, bottom[0]->cpu_data(), bottom[1]->cpu_data(),
           difference_.mutable_cpu_data());
       Dtype loss = caffe_cpu_dot(count, difference_.cpu_data(), difference_.cpu_data());
-      ((Dtype*)(*top)[0]->mutable_cpu_data())[0] = loss / num;
+      ((Dtype*)(*top)[0]->mutable_cpu_data())[0] = scale_ * (loss / num);
     }
 }
 
@@ -134,7 +134,7 @@ void EuclideanLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
           difference_.mutable_gpu_data());
       Dtype loss;
       caffe_gpu_dot(count, difference_.gpu_data(), difference_.gpu_data(), &loss);
-      ((Dtype*)(*top)[0]->mutable_cpu_data())[0] = loss / num;
+      ((Dtype*)(*top)[0]->mutable_cpu_data())[0] = scale_ * (loss / num);
     }
 }
 
@@ -148,7 +148,7 @@ Dtype EuclideanLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   Dtype loss = caffe_cpu_dot(
       count, difference_.cpu_data(), difference_.cpu_data()) / num / Dtype(2);
   // Compute the gradient
-  caffe_cpu_axpby(count, Dtype(1) / num, difference_.cpu_data(), Dtype(0),
+  caffe_cpu_axpby(count, scale_ / num, difference_.cpu_data(), Dtype(0),
       (*bottom)[0]->mutable_cpu_diff());
   return loss;
 }
