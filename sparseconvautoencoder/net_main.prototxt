@@ -49,7 +49,7 @@ layers {
     name: "l1normreg1"
     type: "regularizer_as_loss"
     regularizer: L1
-    regularizer_coeff: 1.
+    regularizer_coeff: 0.000000295
   }
   bottom: "conv1_tanh"
 }
@@ -92,7 +92,7 @@ layers {
   layer {
      name: "reconstruction_error1"
      type: "euclidean_loss"
-     scale: 0.004695
+     scale: 0.000022041
   }
   bottom: "data_cropped"
   bottom: "data_reconstructed"
