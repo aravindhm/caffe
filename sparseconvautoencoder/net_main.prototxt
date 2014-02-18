@@ -4,6 +4,7 @@ layers {
     name: "data"
     type: "data"
     source: "/data/kitti/leveldb/kitti_t1_leveldb/"
+    meanfile: "/data/kitti/kitti_t1_mean.binaryproto"
     batchsize: 32
     cropsize: 227
     mirror: true
