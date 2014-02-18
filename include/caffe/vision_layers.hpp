@@ -50,8 +50,6 @@ class TanHLayer : public NeuronLayer<Dtype> {
  public:
   explicit TanHLayer(const LayerParameter& param)
       : NeuronLayer<Dtype>(param) {}
-  virtual void SetUp(const vector<Blob<Dtype>*>& bottom,
-      vector<Blob<Dtype>*>* top);
 
  protected:
   virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
