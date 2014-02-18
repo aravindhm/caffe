@@ -2,11 +2,12 @@
 """Functions to draw a caffe NetParameter protobuffer.
 """
 
+import sys
+sys.path.append('/code/aravindhm_caffe/python/');
 from caffe.proto import caffe_pb2
 from google.protobuf import text_format
 import pydot
 import os
-import sys
 
 # Internal layer and blob styles.
 LAYER_STYLE = {'shape': 'record', 'fillcolor': '#6495ED',
