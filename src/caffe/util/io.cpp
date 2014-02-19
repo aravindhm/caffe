@@ -120,18 +120,18 @@ vector<cv::Mat> ReadImagesToCvMat(const vector<string>& filenames) {
 }
 
 /* Convert a blob into color mapped images */
-vector<cv::Mat> Blob2ColorMap(const Blob<float>& blob) {
+vector<cv::Mat> Blob2ColorMap(const shared_ptr<Blob<float> > blob) {
   cv::Mat img;
   cv::Mat color_img;
   vector<cv::Mat> color_maps;
 
-  for(int n = 0; n < blob.num(); n++) {
-    for(int c = 0; c < blob.channels(); c++) {
+  for(int n = 0; n < blob->num(); n++) {
+    for(int c = 0; c < blob->channels(); c++) {
        //copy the data into an opencv matrix
-       img.create(blob.height(), blob.width(), CV_8UC(1));
-       for(int h = 0; h < blob.height(); h++) {
-         for(int w = 0; w < blob.width(); w++) {
-           img.at<unsigned char>(h,w) = blob.data_at(n,c,h,w);
+       img.create(blob->height(), blob->width(), CV_8UC(1));
+       for(int h = 0; h < blob->height(); h++) {
+         for(int w = 0; w < blob->width(); w++) {
+           img.at<unsigned char>(h,w) = blob->data_at(n,c,h,w);
          }
        }
        //apply the color map
@@ -142,6 +142,23 @@ vector<cv::Mat> Blob2ColorMap(const Blob<float>& blob) {
     }
   }
   return color_maps;
+}
+
+/* Convert opencv matrix into a blob.
+   Works only for 3D matrices. In other words blob.num() is set to 1
+   */
+shared_ptr<Blob<float> > CvMatToBlob(cv::Mat mat) {
+  shared_ptr<Blob<float> > blob(new Blob<float>(1, mat.channels(), mat.rows, mat.cols));
+  std::cout << mat.channels() << "x" << mat.rows << "x" << mat.cols << std::endl;
+  float* data = blob->mutable_cpu_data();
+  for(int c = 0; c < mat.depth(); c++) {
+    for(int h = 0; h < mat.rows; h++) {
+      for(int w = 0; w < mat.cols; w++) {
+        *(data + blob->offset(0, c, h, w)) = *(mat.data + mat.step[0]*h + mat.step[1]*w + mat.step[2]*c);
+      }
+    }
+  }
+  return blob;
 }
 
 }  // namespace caffe

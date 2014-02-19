@@ -10,6 +10,11 @@
 #include "caffe/blob.hpp"
 #include "caffe/proto/caffe.pb.h"
 
+#include <opencv2/opencv.hpp>
+#include <opencv2/contrib/contrib.hpp>
+
+#include <vector>
+
 using std::string;
 using ::google::protobuf::Message;
 
@@ -47,6 +52,12 @@ inline bool ReadImageToDatum(const string& filename, const int label,
     Datum* datum) {
   return ReadImageToDatum(filename, label, 0, 0, datum);
 }
+
+std::vector<cv::Mat> ReadImagesToCvMat(const std::vector<string>& filenames);
+
+std::vector<cv::Mat> Blob2ColorMap(const shared_ptr<Blob<float> > blob);
+
+shared_ptr<Blob<float> > CvMatToBlob(cv::Mat mat);
 
 }  // namespace caffe
 
