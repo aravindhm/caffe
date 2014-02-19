@@ -71,11 +71,11 @@ CUDA_LIB_DIR := $(CUDA_DIR)/lib64 $(CUDA_DIR)/lib
 MKL_INCLUDE_DIR := $(MKL_DIR)/include
 MKL_LIB_DIR := $(MKL_DIR)/lib $(MKL_DIR)/lib/intel64
 
-INCLUDE_DIRS += ./src ./include $(CUDA_INCLUDE_DIR)
-LIBRARY_DIRS += $(CUDA_LIB_DIR)
+INCLUDE_DIRS += ./src ./include $(CUDA_INCLUDE_DIR) 
+LIBRARY_DIRS += $(CUDA_LIB_DIR) 
 LIBRARIES := cudart cublas curand pthread \
 	glog protobuf leveldb snappy boost_system \
-	opencv_core opencv_highgui opencv_imgproc
+	opencv_core opencv_highgui opencv_imgproc opencv_contrib
 PYTHON_LIBRARIES := boost_python python2.7
 WARNINGS := -Wall
 

@@ -9,11 +9,13 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/highgui/highgui_c.h>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/contrib/contrib.hpp>
 
 #include <algorithm>
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 #include "caffe/common.hpp"
 #include "caffe/util/io.hpp"
@@ -23,6 +25,8 @@ using std::fstream;
 using std::ios;
 using std::max;
 using std::string;
+using std::vector;
+
 using google::protobuf::io::FileInputStream;
 using google::protobuf::io::FileOutputStream;
 using google::protobuf::io::ZeroCopyInputStream;
@@ -100,6 +104,44 @@ bool ReadImageToDatum(const string& filename, const int label,
     }
   }
   return true;
+}
+
+/* Read images given a vector of filenames into a vector of cv::Mat */
+vector<cv::Mat> ReadImagesToCvMat(const vector<string>& filenames) {
+  vector<cv::Mat> images;
+  for(int i = 0; i < filenames.size(); i++) {
+    cv::Mat img = cv::imread(filenames[i]);
+    if(img.empty()) {
+      LOG(FATAL) << "Failed to load image " << filenames[i];
+    }
+    images.push_back(img);
+  }
+  return images;
+}
+
+/* Convert a blob into color mapped images */
+vector<cv::Mat> Blob2ColorMap(const Blob<float>& blob) {
+  cv::Mat img;
+  cv::Mat color_img;
+  vector<cv::Mat> color_maps;
+
+  for(int n = 0; n < blob.num(); n++) {
+    for(int c = 0; c < blob.channels(); c++) {
+       //copy the data into an opencv matrix
+       img.create(blob.height(), blob.width(), CV_8UC(1));
+       for(int h = 0; h < blob.height(); h++) {
+         for(int w = 0; w < blob.width(); w++) {
+           img.at<unsigned char>(h,w) = blob.data_at(n,c,h,w);
+         }
+       }
+       //apply the color map
+       cv::applyColorMap(img, color_img, cv::COLORMAP_JET);
+
+       //push it into the result
+       color_maps.push_back(color_img);
+    }
+  }
+  return color_maps;
 }
 
 }  // namespace caffe
