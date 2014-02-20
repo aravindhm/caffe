@@ -6,7 +6,7 @@ layers {
     source: "/leveldb/kitti/kitti_t1_leveldb/"
     meanfile: "/data/kitti/kitti_t1_mean.binaryproto"
     batchsize: 32
-    cropsize: 128
+    cropsize: 64
     mirror: true
     scale: 0.003921569
   }
@@ -17,7 +17,7 @@ layers {
   layer {
     name: "conv1"
     type: "conv"
-    num_output: 72
+    num_output: 36
     kernelsize: 11
     stride: 1
     weight_filler {
@@ -82,8 +82,8 @@ layers {
     type: "cropping"
     cropx: 8
     cropy: 8
-    crop_width: 114
-    crop_height: 114
+    crop_width: 50
+    crop_height: 50
   }
   bottom: "data"
   top: "data_cropped"

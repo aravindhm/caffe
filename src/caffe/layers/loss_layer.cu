@@ -151,7 +151,7 @@ Dtype EuclideanLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   caffe_cpu_axpby(count, scale_ / num, difference_.cpu_data(), Dtype(0),
       (*bottom)[0]->mutable_cpu_diff());
   caffe_copy(count, (*bottom)[0]->cpu_diff(), (*bottom)[1]->mutable_cpu_diff());
-  
+  LOG(INFO) << "Euclidean loss: " << scale_*loss*2;
   return scale_*loss*2;
 }
 

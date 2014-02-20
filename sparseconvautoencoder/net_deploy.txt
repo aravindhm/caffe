@@ -1,0 +1,59 @@
+input: "data"
+input_dim: 1
+input_dim: 3
+input_dim: 372
+input_dim: 1254
+layers {
+  layer {
+    name: "conv1"
+    type: "conv"
+    num_output: 72
+    kernelsize: 11
+    stride: 1
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.
+    }
+    blobs_lr: 1.
+    blobs_lr: 2.
+    weight_decay: 1.
+    weight_decay: 0.
+  }
+  bottom: "data"
+  top: "conv1"
+}
+layers {
+  layer {
+    name: "tanh1"
+    type: "tanh"
+  }
+  bottom: "conv1"
+  top: "conv1_tanh"
+}
+layers {
+  layer {
+    name: "conv1_reconstuctor"
+    type: "conv"
+    num_output: 3
+    kernelsize: 5
+    stride: 1
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.
+    }
+    blobs_lr: 1.
+    blobs_lr: 2.
+    weight_decay: 1.
+    weight_decay: 0.
+  }
+  bottom: "conv1_tanh"
+  top: "data_reconstructed"
+}
