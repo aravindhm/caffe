@@ -21,6 +21,7 @@
 
 using namespace std;
 
+
 namespace caffe {
 
 template <typename Dtype>
@@ -36,15 +37,6 @@ class IOSimpleTest : public ::testing::Test {
 typedef ::testing::Types<float> Dtypes;
 TYPED_TEST_CASE(IOSimpleTest, Dtypes);
 
-TYPED_TEST(IOSimpleTest, TestInitialization) {
-  EXPECT_TRUE(this->blob_);
-  EXPECT_EQ(this->blob_->num(), 1);
-  EXPECT_EQ(this->blob_->channels(), 3);
-  EXPECT_EQ(this->blob_->height(), 480);
-  EXPECT_EQ(this->blob_->width(), 640);
-  EXPECT_EQ(this->blob_->count(), 3*480*640);
-}
-
 TYPED_TEST(IOSimpleTest, TestBlob2ColorMap) {
 /*  FillerParameter param;
   param.set_type("constant");
@@ -55,10 +47,10 @@ TYPED_TEST(IOSimpleTest, TestBlob2ColorMap) {
   filler.Fill(this->blob_);*/
   cv::Mat img = cv::imread("/data/kitti/sequences/00/image_2/000000.png");
   boost::shared_ptr<Blob<TypeParam> > blobimg = CvMatToBlob(img);
-  std::vector<cv::Mat> colormaps = Blob2ColorMap(blobimg);
+  std::vector<boost::shared_ptr<cv::Mat> > colormaps = Blob2ColorMap(blobimg);
   cv::namedWindow("test_io"); 
   for(int i = 0; i < colormaps.size(); i++) {
-    cv::imshow("test_io", colormaps[i]);
+    cv::imshow("test_io", *(colormaps[i].get()));
     cv::waitKey(0);
   }
   cv::destroyWindow("test_io");

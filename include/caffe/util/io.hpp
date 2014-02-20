@@ -53,11 +53,11 @@ inline bool ReadImageToDatum(const string& filename, const int label,
   return ReadImageToDatum(filename, label, 0, 0, datum);
 }
 
-std::vector<cv::Mat> ReadImagesToCvMat(const std::vector<string>& filenames);
+std::vector<boost::shared_ptr<cv::Mat> > ReadImagesToCvMat(const std::vector<string>& filenames);
 
-std::vector<cv::Mat> Blob2ColorMap(const shared_ptr<Blob<float> > blob);
+std::vector<boost::shared_ptr<cv::Mat> > Blob2ColorMap(const boost::shared_ptr<Blob<float> > blob);
 
-shared_ptr<Blob<float> > CvMatToBlob(cv::Mat mat);
+boost::shared_ptr<Blob<float> > CvMatToBlob(cv::Mat mat);
 
 }  // namespace caffe
 

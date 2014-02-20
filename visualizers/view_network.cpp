@@ -45,25 +45,34 @@ int main(int argc, char* argv[]) {
   // Load the layers in the network
   vector<shared_ptr<Layer<float> > > net_layers = caffe_net -> layers();
 
+  //open index.html for writing.
   fstream fout;
   fout.open("index.html", ios::out);
   if(!fout.good()) {
     cerr << "Error opening index.html" << endl;
     return -1;
   }
+  
+  //write the html header
   fout << "<html><head><title>" << argv[1] << "</title></head>" << endl;
   fout << "<body>" << endl;
+
   // Iterate over the layers and generate color maps for the parameter blobs.
   for(int layerid = 0; layerid < net_layers.size(); layerid++) {
-    fout << "<h4>" << net_layers[layerid]->layer_param().name() << "</h4> <hr/>" << endl;
+    // for each layer, we need to do something only if it has parameters
+    if(net_layers[layerid]->blobs().size() > 0) {
+      fout << "<div style=\"clear:both\"><h4>" << net_layers[layerid]->layer_param().name() << "</h4></div>" << endl;
+    }
+   
+    // for each blob dump out color maps for its paramters
     for(int blobid = 0; blobid < net_layers[layerid]->blobs().size(); blobid++) {
       fout << "<div style=\"clear:both\"> <hr/>" << endl;
-      vector<cv::Mat> color_maps = Blob2ColorMap(net_layers[layerid]->blobs()[blobid]);
+      vector<shared_ptr<cv::Mat> > color_maps = Blob2ColorMap(net_layers[layerid]->blobs()[blobid]);
       for(int colormapid = 0; colormapid < color_maps.size(); colormapid++) {
         stringstream ss;
         ss << net_layers[layerid]->layer_param().name() << "_blob" << blobid << "_" << colormapid << ".png";
         cout << "Writing " << ss.str() << endl;
-        cv::imwrite(ss.str(), color_maps[colormapid]);
+        cv::imwrite(ss.str(), *(color_maps[colormapid].get()));
         int width = max(net_layers[layerid]->blobs()[blobid]->width(), 50);
         int height = max(net_layers[layerid]->blobs()[blobid]->height(), 50);
         fout << "<div style=\"float:left;width:" << width + 5 << ";height:" << height + 5 << "\">" << endl;

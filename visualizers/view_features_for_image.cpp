@@ -57,12 +57,12 @@ int main(int argc, char* argv[]) {
   const vector<shared_ptr<Blob<float> > >& blobs = caffe_net->blobs();
   for (int blobid = 0; blobid < caffe_net->blobs().size(); ++blobid) {
     // Serialize blob
-    vector<cv::Mat> color_maps = Blob2ColorMap(blobs[blobid]);
+    vector<shared_ptr<cv::Mat> > color_maps = Blob2ColorMap(blobs[blobid]);
     for(int colormapid = 0; colormapid < color_maps.size(); colormapid++) {
       stringstream ss;
       ss << blob_names[blobid] << "_" << colormapid << ".png";
       cout << "Writing " << ss.str() << endl;
-      cv::imwrite(ss.str(), color_maps[colormapid]);
+      cv::imwrite(ss.str(), *(color_maps[colormapid].get()));
     }
   }
 
