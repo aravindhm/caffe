@@ -1,13 +1,13 @@
 train_net: "sparseconvautoencoder/net_main.prototxt"
 test_iter: 0
 test_interval: 0
-base_lr: 0.001
+base_lr: 0.01
 lr_policy: "step"
 gamma: 0.1
 stepsize: 100000
-display: 1
+display: 100
 max_iter: 320000
 momentum: 0.9
 weight_decay: 0.0005
 snapshot: 1000
-snapshot_prefix: "/data/kitti/caffe_sparseconvautoencoder_train_lr001"
+snapshot_prefix: "/data/experiments/sparseconvautoencoder/caffe_sparseconvautoencoder_train_lr01"

@@ -6,7 +6,7 @@ layers {
     source: "/leveldb/kitti/kitti_t1_leveldb/"
     meanfile: "/data/kitti/kitti_t1_mean.binaryproto"
     batchsize: 32
-    cropsize: 227
+    cropsize: 128
     mirror: true
     scale: 0.003921569
   }
@@ -68,8 +68,8 @@ layers {
       type: "constant"
       value: 0.
     }
-    blobs_lr: 10.
-    blobs_lr: 20.
+    blobs_lr: 1.
+    blobs_lr: 2.
     weight_decay: 1.
     weight_decay: 0.
   }
@@ -82,8 +82,8 @@ layers {
     type: "cropping"
     cropx: 8
     cropy: 8
-    crop_width: 213
-    crop_height: 213
+    crop_width: 114
+    crop_height: 114
   }
   bottom: "data"
   top: "data_cropped"
