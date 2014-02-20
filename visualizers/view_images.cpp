@@ -41,11 +41,11 @@ int main(int argc, char* argv[]) {
     filenames.push_back(filename);
   }
 
-  vector<cv::Mat> images = caffe::ReadImagesToCvMat(filenames);
+  vector<boost::shared_ptr<cv::Mat> > images = caffe::ReadImagesToCvMat(filenames);
 
   cv::namedWindow("images", cv::WINDOW_AUTOSIZE);
-  for(vector<cv::Mat>::iterator it = images.begin(); it != images.end(); it++) {
-      cv::imshow("images", *it);
+  for(vector<boost::shared_ptr<cv::Mat> >::iterator it = images.begin(); it != images.end(); it++) {
+      cv::imshow("images", *(it->get()));
       cv::waitKey(0);
   }
   
