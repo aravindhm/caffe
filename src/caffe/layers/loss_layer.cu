@@ -10,6 +10,11 @@
 
 using std::max;
 
+#include <iostream>
+
+using std::cout;
+using std::endl;
+
 namespace caffe {
 
 const float kLOG_THRESHOLD = 1e-20;
@@ -146,11 +151,13 @@ Dtype EuclideanLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   caffe_sub(count, (*bottom)[0]->cpu_data(), (*bottom)[1]->cpu_data(),
       difference_.mutable_cpu_data());
   Dtype loss = caffe_cpu_dot(
-      count, difference_.cpu_data(), difference_.cpu_data()) / num / Dtype(2);
+      count, difference_.cpu_data(), difference_.cpu_data()) / num / Dtype(2.);
   // Compute the gradient
-  caffe_cpu_axpby(count, scale_ / num, difference_.cpu_data(), Dtype(0),
+  caffe_cpu_axpby(count, scale_ / num, difference_.cpu_data(), Dtype(0.),
       (*bottom)[0]->mutable_cpu_diff());
-  return loss;
+  caffe_cpu_axpby(count, -scale_ / num, difference_.cpu_data(), Dtype(0.),
+      (*bottom)[1]->mutable_cpu_diff());
+  return scale_*loss*Dtype(2.);
 }
 
 template <typename Dtype>
