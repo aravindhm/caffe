@@ -7,7 +7,7 @@ layers {
   layer {
     name: "conv1"
     type: "conv"
-    num_output: 72
+    num_output: 36
     kernelsize: 11
     stride: 1
     weight_filler {
