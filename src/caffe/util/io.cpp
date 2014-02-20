@@ -26,6 +26,8 @@ using std::ios;
 using std::max;
 using std::string;
 using std::vector;
+using std::cout;
+using std::endl;
 
 using google::protobuf::io::FileInputStream;
 using google::protobuf::io::FileOutputStream;
@@ -123,19 +125,24 @@ vector<cv::Mat> ReadImagesToCvMat(const vector<string>& filenames) {
 vector<cv::Mat> Blob2ColorMap(const shared_ptr<Blob<float> > blob) {
   cv::Mat img;
   cv::Mat color_img;
+  cv::Mat adjMap;
   vector<cv::Mat> color_maps;
+  double min;
+  double max;
 
   for(int n = 0; n < blob->num(); n++) {
     for(int c = 0; c < blob->channels(); c++) {
        //copy the data into an opencv matrix
-       img.create(blob->height(), blob->width(), CV_8UC(1));
+       img.create(blob->height(), blob->width(), CV_32FC(1));
        for(int h = 0; h < blob->height(); h++) {
          for(int w = 0; w < blob->width(); w++) {
-           img.at<unsigned char>(h,w) = blob->data_at(n,c,h,w);
+           img.at<float>(h,w) = blob->data_at(n,c,h,w);
          }
        }
+       cv::minMaxIdx(img, &min, &max);
+       cv::convertScaleAbs(img, adjMap, 255 / max);
        //apply the color map
-       cv::applyColorMap(img, color_img, cv::COLORMAP_JET);
+       cv::applyColorMap(adjMap, color_img, cv::COLORMAP_JET);
 
        //push it into the result
        color_maps.push_back(color_img);
@@ -149,9 +156,8 @@ vector<cv::Mat> Blob2ColorMap(const shared_ptr<Blob<float> > blob) {
    */
 shared_ptr<Blob<float> > CvMatToBlob(cv::Mat mat) {
   shared_ptr<Blob<float> > blob(new Blob<float>(1, mat.channels(), mat.rows, mat.cols));
-  std::cout << mat.channels() << "x" << mat.rows << "x" << mat.cols << std::endl;
   float* data = blob->mutable_cpu_data();
-  for(int c = 0; c < mat.depth(); c++) {
+  for(int c = 0; c < mat.channels(); c++) {
     for(int h = 0; h < mat.rows; h++) {
       for(int w = 0; w < mat.cols; w++) {
         *(data + blob->offset(0, c, h, w)) = *(mat.data + mat.step[0]*h + mat.step[1]*w + mat.step[2]*c);

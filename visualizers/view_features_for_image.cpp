@@ -24,7 +24,7 @@ using namespace boost;
 using namespace caffe;
 
 int main(int argc, char* argv[]) {
-  if(argc < 2) {
+  if(argc < 4) {
     cerr << "Usage: view_features_for_image imagefilename netprototxt trained_net" << endl;
     return -1;
   }
