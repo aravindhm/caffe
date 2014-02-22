@@ -4,7 +4,7 @@
 // and generates the color map of the features in all the layers
 // 
 // Usage:
-//   view_features_for_image imagefilename netprototxt trained_net
+//   view_features_for_image imagefilename netprototxt trained_net htmlprefix
 
 #include <opencv2/opencv.hpp>
 
@@ -25,7 +25,7 @@ using namespace caffe;
 
 int main(int argc, char* argv[]) {
   if(argc < 4) {
-    cerr << "Usage: view_features_for_image imagefilename netprototxt trained_net" << endl;
+    cerr << "Usage: view_features_for_image imagefilename netprototxt trained_net htmlprefix" << endl;
     return -1;
   }
 
@@ -55,7 +55,21 @@ int main(int argc, char* argv[]) {
   
   const vector<string>& blob_names = caffe_net->blob_names();
   const vector<shared_ptr<Blob<float> > >& blobs = caffe_net->blobs();
+
+  //open index.html for writing.
+  fstream fout;
+  fout.open("index.html", ios::out);
+  if(!fout.good()) {
+    cerr << "Error opening index.html" << endl;
+    return -1;
+  }
+  
+  //write the html header
+  fout << "<html><head><title>" << argv[1] << "</title></head>" << endl;
+  fout << "<body>" << endl;
+
   for (int blobid = 0; blobid < caffe_net->blobs().size(); ++blobid) {
+    fout << "<div style=\"clear:both\"><h4>" << blob_names[blobid] << "</h4></div>" << endl;
     // Serialize blob
     vector<shared_ptr<cv::Mat> > color_maps = Blob2ColorMap(blobs[blobid]);
     for(int colormapid = 0; colormapid < color_maps.size(); colormapid++) {
@@ -63,8 +77,19 @@ int main(int argc, char* argv[]) {
       ss << blob_names[blobid] << "_" << colormapid << ".png";
       cout << "Writing " << ss.str() << endl;
       cv::imwrite(ss.str(), *(color_maps[colormapid].get()));
+
+      int width = max(blobs[blobid]->width(), 50);
+      int height = max(blobs[blobid]->height(), 50);
+      fout << "<div style=\"float:left;width:" << width + 5 << ";height:" << height + 5 << "\">" << endl;
+      fout << "<img src=\"/" << argv[4] << ss.str() << "\" alt=\"" << ss.str() << "\" width=" 
+	      << width << " height=" 
+	      << height <<  " />" << endl;
+      fout << "</div>" << endl;
     }
+    fout << "</div>" << endl;
   }
+  fout << "</body></html>" << endl;
+  fout.close();
 
   return 0;
 }

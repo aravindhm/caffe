@@ -141,6 +141,8 @@ vector<boost::shared_ptr<cv::Mat> > Blob2ColorMap(const boost::shared_ptr<Blob<f
          }
        }
        cv::minMaxIdx(img, &min, &max);
+       img = img - min;
+       max = max - min;
        cv::convertScaleAbs(img, adjMap, 255 / max);
        //apply the color map
        cv::applyColorMap(adjMap, *(color_img.get()), cv::COLORMAP_JET);
