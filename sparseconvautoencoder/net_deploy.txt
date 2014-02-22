@@ -1,18 +1,8 @@
-name: "CaffeNet"
-layers {
-  layer {
-    name: "data"
-    type: "data"
-    source: "/leveldb/kitti/kitti_t1_leveldb/"
-    meanfile: "/data/kitti/kitti_t1_mean.binaryproto"
-    batchsize: 32
-    cropsize: 64
-    mirror: true
-    scale: 0.003921569
-  }
-  top: "data"
-  top: "label"
-}
+input: "data"
+input_dim: 1
+input_dim: 3
+input_dim: 372
+input_dim: 1254
 layers {
   layer {
     name: "conv1"
@@ -46,15 +36,6 @@ layers {
 }
 layers {
   layer {
-    name: "l1normreg1"
-    type: "regularizer_as_loss"
-    regularizer: L1
-    regularizer_coeff: 0.000000295
-  }
-  bottom: "conv1_tanh"
-}
-layers {
-  layer {
     name: "conv1_reconstuctor"
     type: "conv"
     num_output: 3
@@ -75,26 +56,4 @@ layers {
   }
   bottom: "conv1_tanh"
   top: "data_reconstructed"
-}
-layers {
-  layer {
-    name: "data_cropper"
-    type: "cropping"
-    cropx: 8
-    cropy: 8
-    crop_width: 50
-    crop_height: 50
-  }
-  bottom: "data"
-  top: "data_cropped"
-}
-layers {
-  layer {
-     name: "reconstruction_error1"
-     type: "euclidean_loss"
-     scale: 1
-  }
-  bottom: "data_cropped"
-  bottom: "data_reconstructed"
-  top: "loss"
 }

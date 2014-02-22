@@ -145,12 +145,15 @@ Dtype EuclideanLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   int num = (*bottom)[0]->num();
   caffe_sub(count, (*bottom)[0]->cpu_data(), (*bottom)[1]->cpu_data(),
       difference_.mutable_cpu_data());
-  Dtype loss = caffe_cpu_dot(
-      count, difference_.cpu_data(), difference_.cpu_data()) / num / Dtype(2);
+  Dtype loss = 1/Dtype(2.) * caffe_cpu_dot(
+      count, difference_.cpu_data(), difference_.cpu_data()) / num;
   // Compute the gradient
   caffe_cpu_axpby(count, scale_ / num, difference_.cpu_data(), Dtype(0),
       (*bottom)[0]->mutable_cpu_diff());
-  return loss;
+  caffe_cpu_axpby(count, -scale_ / num, difference_.cpu_data(), Dtype(0),
+      (*bottom)[1]->mutable_cpu_diff());
+  LOG(INFO) << "Euclidean loss: " << scale_*loss*2;
+  return scale_*loss*2;
 }
 
 template <typename Dtype>
