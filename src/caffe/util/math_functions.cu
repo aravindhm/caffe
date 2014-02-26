@@ -32,6 +32,7 @@ void caffe_gpu_mul<double>(const int N, const double* a,
       N, a, b, y);
 }
 
+/* grid stride kernel */
 template <typename Dtype>
 __global__ void sub_kernel(const int n, const Dtype* a,
     const Dtype* b, Dtype* y) {
