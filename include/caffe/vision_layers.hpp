@@ -553,9 +553,7 @@ template <typename Dtype>
 class EuclideanLossLayer : public Layer<Dtype> {
  public:
   explicit EuclideanLossLayer(const LayerParameter& param)
-      : Layer<Dtype>(param), difference_() {
-    scale_ = param.scale();
-  }
+      : Layer<Dtype>(param), difference_(), scale_(param.scale()) {}
   virtual void SetUp(const vector<Blob<Dtype>*>& bottom,
       vector<Blob<Dtype>*>* top);
 
