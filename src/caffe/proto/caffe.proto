@@ -36,6 +36,7 @@ message FillerParameter {
   optional float max = 4 [default = 1]; // the max value in uniform filler
   optional float mean = 5 [default = 0]; // the mean value in gaussian filler
   optional float std = 6 [default = 1]; // the std value in gaussian filler
+  repeated float hard_coded_value = 7; // a hard coded initialization for all the paramaters
 }
 
 message LayerParameter {
@@ -83,6 +84,11 @@ message LayerParameter {
   optional int32 cropy = 23 [default = 1]; //The crop start y position
   optional int32 crop_width = 24 [default = 1]; //The crop width
   optional int32 crop_height = 25 [default = 1]; //The crop height
+  
+  // Parameters for image resize layer
+  optional int32 target_width = 26 [default = 1]; //The target resize width
+  optional int32 target_height = 27 [default = 1]; //The target resize height
+
   // The blobs containing the numeric parameters of the layer
   repeated BlobProto blobs = 50;
   // The ratio that is multiplied on the global learning rate. If you want to set

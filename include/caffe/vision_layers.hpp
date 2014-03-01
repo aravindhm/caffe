@@ -146,6 +146,26 @@ class SplitLayer : public Layer<Dtype> {
   int count_;
 };
 
+template <typename Dtype>
+class DataShiftLayer : public Layer<Dtype> {
+ public:
+  explicit DataShiftLayer(const LayerParameter& param)
+      : Layer<Dtype>(param) {}
+  virtual void SetUp(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+
+ protected:
+  virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+  virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+  virtual Dtype Backward_cpu(const vector<Blob<Dtype>*>& top,
+      const bool propagate_down, vector<Blob<Dtype>*>* bottom);
+  virtual Dtype Backward_gpu(const vector<Blob<Dtype>*>& top,
+      const bool propagate_down, vector<Blob<Dtype>*>* bottom);
+  int count_;
+  int offset_;
+};
 
 template <typename Dtype>
 class FlattenLayer : public Layer<Dtype> {
@@ -245,6 +265,27 @@ class CroppingLayer : public Layer<Dtype> {
   int WIDTH_OUT_;
   int STARTX_;
   int STARTY_;
+};
+
+template <typename Dtype>
+class ImageResizeLayer : public Layer<Dtype> {
+ public:
+  explicit ImageResizeLayer(const LayerParameter& param)
+      : Layer<Dtype>(param) {}
+  virtual void SetUp(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+
+ protected:
+  virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+  virtual Dtype Backward_cpu(const vector<Blob<Dtype>*>& top,
+      const bool propagate_down, vector<Blob<Dtype>*>* bottom);
+  int NUM_;
+  int CHANNEL_;
+  int HEIGHT_IN_;
+  int WIDTH_IN_;
+  int HEIGHT_OUT_;
+  int WIDTH_OUT_;
 };
 
 

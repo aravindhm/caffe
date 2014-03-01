@@ -1,0 +1,372 @@
+name: "CaffeNet"
+layers {
+  layer {
+    name: "data"
+    type: "data"
+    source: "/leveldb/kitti/kitti_t1_halfshuffled_leveldb"
+    meanfile: "/data/kitti/kitti_t1_half_mean.binaryproto"
+    batchsize: 32
+    cropsize: 227
+    mirror: true
+    scale: 0.003921569
+  }
+  top: "data"
+  top: "label"
+}
+layers {
+  layer {
+    name: "data_padding"
+    type: "padding"
+    pad: 5
+  }
+  bottom: "data"
+  top: "data_padded"
+}
+layers {
+  layer {
+    name: "conv1"
+    type: "conv"
+    num_output: 72
+    kernelsize: 11
+    stride: 4
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.
+    }
+    blobs_lr: 1.
+    blobs_lr: 2.
+    weight_decay: 1.
+    weight_decay: 0.
+  }
+  bottom: "data_padded"
+  top: "conv1"
+}
+layers {
+  layer {
+    name: "tanh1"
+    type: "tanh"
+  }
+  bottom: "conv1"
+  top: "conv1_tanh"
+}
+layers {
+  layer {
+    name: "l1normreg1"
+    type: "regularizer_as_loss"
+    regularizer: L1
+    regularizer_coeff: 0.0000002400
+  }
+  bottom: "conv1_tanh"
+}
+layers {
+  layer {
+    name: "conv1_tanh_pad"
+    type: "padding"
+    pad: 2
+  }
+  bottom: "conv1_tanh"
+  top: "conv1_tanh_padded"
+}
+layers {
+  layer {
+    name: "conv1_reconstuctor"
+    type: "conv"
+    num_output: 3
+    kernelsize: 5
+    stride: 1
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.
+    }
+    blobs_lr: 1.
+    blobs_lr: 2.
+    weight_decay: 1.
+    weight_decay: 0.
+  }
+  bottom: "conv1_tanh_padded"
+  top: "data_reconstructed"
+}
+layers {
+  layer{
+    name: "data_padding2"
+    type: "padding"
+    pad: 2
+  }
+  bottom: "data"
+  top: "data_padded2"
+}
+layers {
+  layer {
+    name: "data_resizer"
+    type: "conv"
+    num_output: 3
+    kernelsize: 5
+    stride: 4
+    weight_filler {
+      type: "hard_coded"
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+
+
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+
+
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+      hard_coded_value: 0
+
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+      hard_coded_value: 0.04
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.
+    }
+    blobs_lr: 0.
+    blobs_lr: 0.
+    weight_decay: 1.
+    weight_decay: 0.
+  }
+  bottom: "data_padded2"
+  top: "data_resized"
+}
+layers {
+  layer {
+     name: "reconstruction_error1"
+     type: "euclidean_loss"
+     scale: 0.00000212
+  }
+  bottom: "data_resized"
+  bottom: "data_reconstructed"
+  top: "loss"
+}

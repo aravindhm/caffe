@@ -46,6 +46,22 @@ class ConstantFiller : public Filler<Dtype> {
 };
 
 template <typename Dtype>
+class HardCodedFiller : public Filler<Dtype> {
+ public:
+  explicit HardCodedFiller(const FillerParameter& param)
+      : Filler<Dtype>(param) {}
+  virtual void Fill(Blob<Dtype>* blob) {
+    Dtype* data = blob->mutable_cpu_data();
+    const int count = blob->count();
+    CHECK(count);
+    CHECK_EQ(count, this->filler_param_.hard_coded_value_size());
+    for(int i = 0; i < count; i++) {
+       data[i] = this->filler_param_.hard_coded_value(i);
+    }
+  };
+};
+
+template <typename Dtype>
 class UniformFiller : public Filler<Dtype> {
  public:
   explicit UniformFiller(const FillerParameter& param)
@@ -128,6 +144,8 @@ Filler<Dtype>* GetFiller(const FillerParameter& param) {
   const std::string& type = param.type();
   if (type == "constant") {
     return new ConstantFiller<Dtype>(param);
+  }  else if (type == "hard_coded") {
+    return new HardCodedFiller<Dtype>(param);
   } else if (type == "gaussian") {
     return new GaussianFiller<Dtype>(param);
   } else if (type == "positive_unitball") {

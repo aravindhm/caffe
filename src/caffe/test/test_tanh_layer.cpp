@@ -52,10 +52,11 @@ TYPED_TEST(TanHLayerTest, TestForwardCPU) {
     for (int j = 0; j < this->blob_bottom_->channels(); ++j) {
       for (int k = 0; k < this->blob_bottom_->height(); ++k) {
         for (int l = 0; l < this->blob_bottom_->width(); ++l) {
-          EXPECT_GE(this->blob_top_->data_at(i,j,k,l) + 1e-4,
+          /*EXPECT_GE(this->blob_top_->data_at(i,j,k,l) + 1e-4,
              (exp(2*this->blob_bottom_->data_at(i,j,k,l))-1)/(exp(2*this->blob_bottom_->data_at(i,j,k,l))+1));
           EXPECT_LE(this->blob_top_->data_at(i,j,k,l) - 1e-4,
-             (exp(2*this->blob_bottom_->data_at(i,j,k,l))-1)/(exp(2*this->blob_bottom_->data_at(i,j,k,l))+1));
+             (exp(2*this->blob_bottom_->data_at(i,j,k,l))-1)/(exp(2*this->blob_bottom_->data_at(i,j,k,l))+1));*/
+          EXPECT_NEAR(this->blob_top_->data_at(i,j,k,l), tanh(this->blob_bottom_->data_at(i,j,k,l)), 1e-4);
         }
       }
     }
@@ -81,10 +82,12 @@ TYPED_TEST(TanHLayerTest, TestForwardGPU) {
     for (int j = 0; j < this->blob_bottom_->channels(); ++j) {
       for (int k = 0; k < this->blob_bottom_->height(); ++k) {
         for (int l = 0; l < this->blob_bottom_->width(); ++l) {
-          EXPECT_GE(this->blob_top_->data_at(i,j,k,l) + 1e-4,
+          /*EXPECT_GE(this->blob_top_->data_at(i,j,k,l) + 1e-4,
              (exp(2*this->blob_bottom_->data_at(i,j,k,l))-1)/(exp(2*this->blob_bottom_->data_at(i,j,k,l))+1));
           EXPECT_LE(this->blob_top_->data_at(i,j,k,l) - 1e-4,
              (exp(2*this->blob_bottom_->data_at(i,j,k,l))-1)/(exp(2*this->blob_bottom_->data_at(i,j,k,l))+1));
+          */
+          EXPECT_NEAR(this->blob_top_->data_at(i,j,k,l), tanh(this->blob_bottom_->data_at(i,j,k,l)), 1e-4);
         }
       }
     }

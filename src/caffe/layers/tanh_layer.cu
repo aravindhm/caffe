@@ -12,11 +12,12 @@ void TanHLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     vector<Blob<Dtype>*>* top) {
   const Dtype* bottom_data = bottom[0]->cpu_data();
   Dtype* top_data = (*top)[0]->mutable_cpu_data();
-  Dtype exp2x;
+  //Dtype exp2x;
   const int count = bottom[0]->count();
   for (int i = 0; i < count; ++i) {
-    exp2x = exp(2*bottom_data[i]);
-    top_data[i] = (exp2x - Dtype(1))/(exp2x + Dtype(1));
+    top_data[i] = tanh(bottom_data[i]);
+    //exp2x = exp(2*bottom_data[i]);
+    //top_data[i] = (exp2x - Dtype(1))/(exp2x + Dtype(1));
   }
 }
 
@@ -29,11 +30,12 @@ Dtype TanHLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     const Dtype* top_diff = top[0]->cpu_diff();
     Dtype* bottom_diff = (*bottom)[0]->mutable_cpu_diff();
     const int count = (*bottom)[0]->count();
-    Dtype exp2x;
+    //Dtype exp2x;
     Dtype tanhx;
     for (int i = 0; i < count; ++i) {
-      exp2x = exp(2*bottom_data[i]);
-      tanhx = (exp2x - Dtype(1))/(exp2x + Dtype(1));
+      //exp2x = exp(2*bottom_data[i]);
+      //tanhx = (exp2x - Dtype(1))/(exp2x + Dtype(1));
+      tanhx = tanh(bottom_data[i]);
       bottom_diff[i] = top_diff[i] * (1 - tanhx*tanhx);
     }
   }
@@ -44,8 +46,9 @@ template <typename Dtype>
 __global__ void TanHForward(const int n, const Dtype* in, Dtype* out) {
   int index = threadIdx.x + blockIdx.x * blockDim.x;
   if (index < n) {
-    Dtype exp2x = exp(2*in[index]);
-    out[index] = (exp2x - Dtype(1))/(exp2x + Dtype(1));
+    //Dtype exp2x = exp(2*in[index]);
+    //out[index] = (exp2x - Dtype(1))/(exp2x + Dtype(1));
+    out[index] = tanh(in[index]);
   }
 }
 
@@ -69,8 +72,11 @@ __global__ void TanHBackward(const int n, const Dtype* in_diff,
     const Dtype* in_data, Dtype* out_diff) {
   int index = threadIdx.x + blockIdx.x * blockDim.x;
   if (index < n) {
-    Dtype exp2x = exp(2*in_data[index]);
+    /*Dtype exp2x = exp(2*in_data[index]);
     Dtype tanhx = (exp2x - Dtype(1))/(exp2x + Dtype(1));
+    out_diff[index] = in_diff[index] * (1 - tanhx*tanhx);
+    */
+    Dtype tanhx = tanh(in_data[index]);
     out_diff[index] = in_diff[index] * (1 - tanhx*tanhx);
   }
 }

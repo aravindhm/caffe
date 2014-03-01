@@ -39,6 +39,65 @@ TYPED_TEST(ConstantFillerTest, TestFill) {
   }
 }
 
+template <typename Dtype>
+class HardCodedFillerTest : public ::testing::Test {
+ protected:
+  HardCodedFillerTest()
+      : blob_(new Blob<Dtype>(2, 3, 2, 2)),
+        filler_param_() {
+    filler_param_.add_hard_coded_value(1);
+    filler_param_.add_hard_coded_value(1);
+    filler_param_.add_hard_coded_value(1);
+    filler_param_.add_hard_coded_value(1);
+    filler_param_.add_hard_coded_value(2);
+    filler_param_.add_hard_coded_value(2);
+    filler_param_.add_hard_coded_value(2);
+    filler_param_.add_hard_coded_value(2);
+    filler_param_.add_hard_coded_value(3);
+    filler_param_.add_hard_coded_value(3);
+    filler_param_.add_hard_coded_value(3);
+    filler_param_.add_hard_coded_value(3);
+    filler_param_.add_hard_coded_value(11);
+    filler_param_.add_hard_coded_value(11);
+    filler_param_.add_hard_coded_value(11);
+    filler_param_.add_hard_coded_value(11);
+    filler_param_.add_hard_coded_value(12);
+    filler_param_.add_hard_coded_value(12);
+    filler_param_.add_hard_coded_value(12);
+    filler_param_.add_hard_coded_value(12);
+    filler_param_.add_hard_coded_value(13);
+    filler_param_.add_hard_coded_value(13);
+    filler_param_.add_hard_coded_value(13);
+    filler_param_.add_hard_coded_value(13);
+    filler_.reset(new HardCodedFiller<Dtype>(filler_param_));
+    filler_->Fill(blob_);
+  };
+  virtual ~HardCodedFillerTest() { delete blob_; }
+  Blob<Dtype>* const blob_;
+  FillerParameter filler_param_;
+  shared_ptr<HardCodedFiller<Dtype> > filler_;
+};
+
+TYPED_TEST_CASE(HardCodedFillerTest, Dtypes);
+
+TYPED_TEST(HardCodedFillerTest, TestFill) {
+  EXPECT_TRUE(this->blob_);
+  const int count = this->blob_->count();
+  const int num = this->blob_->num();
+  const int channels = this->blob_->channels();
+  const int width = this->blob_->width();
+  const int height = this->blob_->height();
+  const TypeParam* data = this->blob_->cpu_data();
+  for (int n = 0; n < num; n++) {
+    for (int c = 0; c < channels; c++) {
+      for (int w = 0; w < width; w++) {
+        for (int h = 0; h < height; h++) {
+          EXPECT_EQ(data[this->blob_->offset(n,c,h,w)], 10*n+c+1);
+        }
+      }
+    }
+  }
+}
 
 template <typename Dtype>
 class UniformFillerTest : public ::testing::Test {
