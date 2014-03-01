@@ -75,7 +75,7 @@ INCLUDE_DIRS += ./src ./include $(CUDA_INCLUDE_DIR)
 LIBRARY_DIRS += $(CUDA_LIB_DIR) 
 LIBRARIES := cudart cublas curand pthread \
 	glog protobuf leveldb snappy boost_system \
-	opencv_core opencv_highgui opencv_imgproc opencv_contrib
+	opencv_core opencv_highgui opencv_imgproc opencv_contrib blas
 PYTHON_LIBRARIES := boost_python python2.7
 WARNINGS := -Wall
 
@@ -94,6 +94,7 @@ CXXFLAGS += -pthread -fPIC $(COMMON_FLAGS)
 NVCCFLAGS := -ccbin=$(CXX) -Xcompiler -fPIC $(COMMON_FLAGS)
 LDFLAGS += $(foreach librarydir,$(LIBRARY_DIRS),-L$(librarydir)) \
 		$(foreach library,$(LIBRARIES),-l$(library))
+#LDFLAGS += linear.o tron.o
 PYTHON_LDFLAGS := $(LDFLAGS) $(foreach library,$(PYTHON_LIBRARIES),-l$(library))
 
 ##############################

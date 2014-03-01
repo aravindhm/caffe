@@ -76,10 +76,15 @@ int main(int argc, char* argv[]) {
       stringstream ss;
       ss << blob_names[blobid] << "_" << colormapid << ".png";
       cout << "Writing " << ss.str() << endl;
-      cv::imwrite(ss.str(), *(color_maps[colormapid].get()));
+      int new_width = min(color_maps[colormapid]->cols, 640);
+      int new_height = (color_maps[colormapid]->rows*1.0/color_maps[colormapid]->cols) * new_width;
+      cout << "Resizing to " << new_width << "x" << new_height << endl;
+      cv::Mat img_to_be_written;
+      cv::resize(*(color_maps[colormapid].get()), img_to_be_written, cv::Size(new_width, new_height));
+      cv::imwrite(ss.str(), img_to_be_written);
 
-      int width = max(blobs[blobid]->width(), 50);
-      int height = max(blobs[blobid]->height(), 50);
+      int width = img_to_be_written.cols;
+      int height = img_to_be_written.rows;
       fout << "<div style=\"float:left;width:" << width + 5 << ";height:" << height + 5 << "\">" << endl;
       fout << "<img src=\"/" << argv[4] << ss.str() << "\" alt=\"" << ss.str() << "\" width=" 
 	      << width << " height=" 
