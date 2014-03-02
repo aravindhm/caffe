@@ -1,0 +1,13 @@
+train_net: "pooledsparseconvautoencoder/net_main_verylargeeuclideanloss_lowl1sparse_manykernels_stride4_highlr_largereconkernelstep5000.prototxt"
+test_iter: 0
+test_interval: 0
+base_lr: 0.01
+lr_policy: "step"
+gamma: 0.99
+stepsize: 1
+display: 10
+max_iter: 100000
+momentum: 0.9
+weight_decay: 0.0005
+snapshot: 100
+snapshot_prefix: "/snapshots/pooledsparseconvautoencoder/caffe_pooledsparseconvautoencoder_train_lr05_step5000_gamma9_momentum9_wdecay0005_verylargeeuclideanloss_lowl1sparse_manykernels_stride4_highlr_largereconkernel"

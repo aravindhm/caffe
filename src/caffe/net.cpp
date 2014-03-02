@@ -256,16 +256,18 @@ void Net<Dtype>::CopyTrainedLayersFrom(const NetParameter& param) {
   for (int i = 0; i < num_source_layers; ++i) {
     const LayerParameter& source_layer = param.layers(i).layer();
     const string& source_layer_name = source_layer.name();
+    DLOG(INFO) << "Trying to find match for " << source_layer_name;
     int target_layer_id = 0;
     while (target_layer_id != layer_names_.size() &&
         layer_names_[target_layer_id] != source_layer_name) {
+      DLOG(INFO) << "Mismatch " << layer_names_[target_layer_id];
       ++target_layer_id;
     }
     if (target_layer_id == layer_names_.size()) {
-      DLOG(INFO) << "Ignoring source layer " << source_layer_name;
+      LOG(INFO) << "Ignoring source layer " << source_layer_name;
       continue;
     }
-    DLOG(INFO) << "Copying source layer " << source_layer_name;
+    LOG(INFO) << "Copying source layer " << source_layer_name;
     vector<shared_ptr<Blob<Dtype> > >& target_blobs =
         layers_[target_layer_id]->blobs();
     CHECK_EQ(target_blobs.size(), source_layer.blobs_size())
