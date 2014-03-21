@@ -41,6 +41,10 @@ Layer<Dtype>* GetLayer(const LayerParameter& param) {
     return new InfogainLossLayer<Dtype>(param);
   } else if (type == "innerproduct") {
     return new InnerProductLayer<Dtype>(param);
+  } else if (type == "compute_covariance") {
+    return new ComputeCovarianceLayer<Dtype>(param);
+  } else if (type == "whitening_layer") {
+    return new WhiteningLayer<Dtype>(param);
   } else if (type == "lrn") {
     return new LRNLayer<Dtype>(param);
   } else if (type == "padding") {

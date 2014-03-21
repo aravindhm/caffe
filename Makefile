@@ -71,7 +71,7 @@ INCLUDE_DIRS += ./src ./include $(CUDA_INCLUDE_DIR)
 LIBRARY_DIRS += $(CUDA_LIB_DIR)
 LIBRARIES := cudart cublas curand pthread \
 	glog protobuf leveldb snappy boost_system \
-	opencv_core opencv_highgui opencv_imgproc
+	opencv_core opencv_highgui opencv_imgproc cufft
 PYTHON_LIBRARIES := boost_python python2.7
 WARNINGS := -Wall
 

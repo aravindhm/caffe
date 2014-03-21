@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
     lines.push_back(filename);
   } 
  // if(argc == 4 && argv[3][0] == '1') {
-    std::random_shuffle(lines.begin(), lines.end());
+ //   std::random_shuffle(lines.begin(), lines.end());
  // }
   LOG(INFO) << "A total of " << lines.size() << " csv files.";
   fcsv.close();
@@ -66,7 +66,7 @@ int main(int argc, char** argv) {
   const int maxKeyLength = 256;
   char key_cstr[maxKeyLength];
   leveldb::WriteBatch* batch = new leveldb::WriteBatch();
-  for(int line_id = 0; line_id < 1000/*lines.size()*/; line_id++) {
+  for(int line_id = 0; line_id < lines.size(); line_id++) {
      // For each csv file. Read content into local variables
      // and then crop the images and write them to disk
      std::ifstream fboxes(lines[line_id].c_str());
@@ -86,7 +86,7 @@ int main(int argc, char** argv) {
      vector<vector<int> > boxes;
      vector<vector<int> > labels;
      fboxes >> imgfilename >> imgset >> numboxes >> boxdim;
-     //if(imgset == 3 || imgset == 1) { continue; } // We are collecting val data only.
+ //    if(imgset == 3 || imgset == 1) { continue; } // We are collecting val data only.
      for(int j = 0; j < numboxes; j++) {
          vector<int> temp(boxdim);
          fboxes >> temp[0] >> temp[1] >> temp[2] >> temp[3];
@@ -95,8 +95,8 @@ int main(int argc, char** argv) {
      fboxes >> numlabels >> labeldim;
      for(int j = 0; j < numlabels; j++) {
          vector<int> temp(labeldim);
-         fboxes >> temp[0] >> temp[1] >> temp[2] >> temp[3] >> temp[4] >> temp[5] 
-                          >> temp[6] >> temp[7] >> temp[8] >> temp[9];
+         fboxes >> temp[0] >> temp[1] >> temp[2] >> temp[3]; // >> temp[4] >> temp[5] 
+                         // >> temp[6] >> temp[7] >> temp[8] >> temp[9];
          
          labels.push_back(temp);
      }
@@ -116,9 +116,9 @@ int main(int argc, char** argv) {
         continue;
      }
      for(int boxno = 0; boxno < numboxes; boxno++) {
-         if(labels[boxno][2] == 1 && labels[boxno][9] != 1) {  
+        /* if(labels[boxno][2] == 1 && labels[boxno][9] != 1) {  
            continue;  //Only the ground truth bounding boxes are the positives. The negatives come from selective search windows
-         }
+         }*/
          /*if(labels[boxno][9] == 1 && imgset == 2) { 
            continue; // for now remove the ground truth labels from validation data.
          }*/

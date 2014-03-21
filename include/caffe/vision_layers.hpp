@@ -213,6 +213,53 @@ class InnerProductLayer : public Layer<Dtype> {
   shared_ptr<SyncedMemory> bias_multiplier_;
 };
 
+template <typename Dtype>
+class WhiteningLayer : public Layer<Dtype> {
+ public:
+  explicit WhiteningLayer(const LayerParameter& param)
+      : Layer<Dtype>(param) {}
+  virtual void SetUp(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+
+ protected:
+  virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+  virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+
+  virtual Dtype Backward_cpu(const vector<Blob<Dtype>*>& top,
+      const bool propagate_down, vector<Blob<Dtype>*>* bottom);
+  virtual Dtype Backward_gpu(const vector<Blob<Dtype>*>& top,
+      const bool propagate_down, vector<Blob<Dtype>*>* bottom);
+  Blob<Dtype> whitening_matrix_;
+  int M_;
+  int N_;
+  int K_;
+};
+
+template <typename Dtype>
+class ComputeCovarianceLayer : public Layer<Dtype> {
+ public:
+  explicit ComputeCovarianceLayer(const LayerParameter& param)
+      : Layer<Dtype>(param) {}
+  virtual void SetUp(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+
+ protected:
+  virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+  virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+
+  virtual Dtype Backward_cpu(const vector<Blob<Dtype>*>& top,
+      const bool propagate_down, vector<Blob<Dtype>*>* bottom) { } // no backward for this.
+  virtual Dtype Backward_gpu(const vector<Blob<Dtype>*>& top,
+      const bool propagate_down, vector<Blob<Dtype>*>* bottom) {} // no backward for this.
+  int M_; // sizes of matrices involved. Just makes the code for Forward_x clean
+  int K_;
+  int N_;
+  long long int total_data_; // stores the total number of data points seen.
+};
 
 template <typename Dtype>
 class PaddingLayer : public Layer<Dtype> {

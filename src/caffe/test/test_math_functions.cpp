@@ -22,6 +22,7 @@ class MathFunctionsTest : public ::testing::Test {
         ,b_(new Blob<Dtype>(2, 3, 6, 5))
         ,y_(new Blob<Dtype>(2, 3, 6, 5))
         ,a_cpu_data_(a_->cpu_data())
+        ,a_gpu_data_(a_->gpu_data())
         ,b_cpu_data_(b_->cpu_data())
         ,y_cpu_data_(y_->mutable_cpu_data())
         ,near_delta_(1e-5)
@@ -45,6 +46,7 @@ class MathFunctionsTest : public ::testing::Test {
   Blob<Dtype>* b_;
   Blob<Dtype>* y_;
   const Dtype* const a_cpu_data_;
+  const Dtype* const a_gpu_data_;
   const Dtype* const b_cpu_data_;
   Dtype* y_cpu_data_;
   const Dtype near_delta_;
@@ -188,6 +190,34 @@ TYPED_TEST(MathFunctionsTest, TestExp) {
     for (int i = 0; i < this->num_; ++i) {
       EXPECT_NEAR(this->y_cpu_data_[i], std::exp(this->a_cpu_data_[i]), this->near_delta_);
     }
+  }
+}
+
+TYPED_TEST(MathFunctionsTest, TestMeanCPU) {
+  GaussianFiller<TypeParam> filler(this->filler_param_);
+  for (int l = 0; l < this->loops_; ++l) {
+    filler.Fill(this->a_);
+    TypeParam mean = caffe_cpu_mean(this->a_->count(), this->a_cpu_data_);
+    TypeParam gtmean = 0.0;
+    for (int i = 0; i < this->a_->count(); ++i) {
+      gtmean = gtmean + this->a_cpu_data_[i];
+    }
+    gtmean = gtmean / this->a_->count();
+    EXPECT_NEAR(mean, gtmean, this->near_delta_);
+  }
+}
+TYPED_TEST(MathFunctionsTest, TestMeanGPU) {
+  GaussianFiller<TypeParam> filler(this->filler_param_);
+  for (int l = 0; l < this->loops_; ++l) {
+    filler.Fill(this->a_);
+    TypeParam mean = caffe_gpu_mean(this->a_->count(), this->a_->gpu_data());
+    TypeParam gtmean = 0.0;
+    const TypeParam* a_cpu_data = this->a_->cpu_data();
+    for (int i = 0; i < this->a_->count(); ++i) {
+      gtmean = gtmean + a_cpu_data[i];
+    }
+    gtmean = gtmean / this->a_->count();
+    EXPECT_NEAR(mean, gtmean, this->near_delta_);
   }
 }
 

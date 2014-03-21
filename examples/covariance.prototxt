@@ -1,0 +1,21 @@
+name: "CaffeNet"
+layers {
+  layer {
+    name: "data"
+    type: "data"
+    source: "/leveldb/kitti/kitti_t1_half_leveldb_copy1"
+    batchsize: 128
+    cropsize: 84
+    mirror: true
+  }
+  top: "data"
+  top: "label"
+}
+layers {
+  layer{
+    name: "covariance_computer"
+    type: "compute_covariance"
+  }
+  bottom: "data"
+  top: "thecov"
+}

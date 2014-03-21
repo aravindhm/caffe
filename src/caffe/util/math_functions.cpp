@@ -186,6 +186,24 @@ void caffe_cpu_axpby<double>(const int N, const double alpha, const double* X,
 }
 
 template <>
+float caffe_cpu_mean<float>(const int N, const float* X) {
+  float sum = 0;
+  for (int i = 0; i < N; i++) { 
+    sum = sum + X[i];
+  }
+  return sum/N;
+}
+
+template <>
+double caffe_cpu_mean<double>(const int N, const double* X) {
+  double sum = 0;
+  for (int i = 0; i < N; i++) { 
+    sum = sum + X[i];
+  }
+  return sum/N;
+}
+
+template <>
 void caffe_add<float>(const int n, const float* a, const float* b,
     float* y) {
   vsAdd(n, a, b, y);
@@ -207,6 +225,22 @@ template <>
 void caffe_sub<double>(const int n, const double* a, const double* b,
     double* y) {
   vdSub(n, a, b, y);
+}
+
+template <>
+void caffe_sub<float>(const int n, const float* a, const float b,
+    float* y) {
+  for(int i = 0; i < n; i++) {
+    y[i] = a[i]-b;
+  }
+}
+
+template <>
+void caffe_sub<double>(const int n, const double* a, const double b,
+    double* y) {
+  for(int i = 0; i < n; i++) {
+    y[i] = a[i]-b;
+  }
 }
 
 template <>

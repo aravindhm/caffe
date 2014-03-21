@@ -112,6 +112,8 @@ message LayerParameter {
   optional RegularizerType regularizer = 60;
   // Coefficent controls how strong to regularize
   optional float regularizer_coeff = 61; 
+
+  optional string whitening_matrix_file = 62;  // This file is a binary proto storing the whitening matrix
 }
 
 message LayerConnection {

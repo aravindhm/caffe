@@ -43,12 +43,12 @@ int main(int argc, char** argv) {
     lines.push_back(filename);
   } 
  // if(argc == 4 && argv[3][0] == '1') {
-    std::random_shuffle(lines.begin(), lines.end());
+ //   std::random_shuffle(lines.begin(), lines.end());
  // }
   LOG(INFO) << "A total of " << lines.size() << " csv files.";
   fcsv.close();
 
-  // Setup the leveldb
+/*  // Setup the leveldb
   leveldb::DB* db;
   leveldb::Options options;
   options.error_if_exists = true;
@@ -58,15 +58,15 @@ int main(int argc, char** argv) {
   leveldb::Status status = leveldb::DB::Open(
       options, argv[2], &db);
   CHECK(status.ok()) << "Failed to open leveldb " << argv[2];
-  
+  */
   //cv::namedWindow("debug");
 
   Datum datum; 
   int count = 0;
   const int maxKeyLength = 256;
   char key_cstr[maxKeyLength];
-  leveldb::WriteBatch* batch = new leveldb::WriteBatch();
-  for(int line_id = 0; line_id < 1000/*lines.size()*/; line_id++) {
+//  leveldb::WriteBatch* batch = new leveldb::WriteBatch();
+  for(int line_id = 0; line_id < 1000 /*lines.size()*/; line_id++) {
      // For each csv file. Read content into local variables
      // and then crop the images and write them to disk
      std::ifstream fboxes(lines[line_id].c_str());
@@ -86,7 +86,7 @@ int main(int argc, char** argv) {
      vector<vector<int> > boxes;
      vector<vector<int> > labels;
      fboxes >> imgfilename >> imgset >> numboxes >> boxdim;
-     //if(imgset == 3 || imgset == 1) { continue; } // We are collecting val data only.
+ //    if(imgset == 3 || imgset == 1) { continue; } // We are collecting val data only.
      for(int j = 0; j < numboxes; j++) {
          vector<int> temp(boxdim);
          fboxes >> temp[0] >> temp[1] >> temp[2] >> temp[3];
@@ -96,63 +96,28 @@ int main(int argc, char** argv) {
      for(int j = 0; j < numlabels; j++) {
          vector<int> temp(labeldim);
          fboxes >> temp[0] >> temp[1] >> temp[2] >> temp[3] >> temp[4] >> temp[5] 
-                          >> temp[6] >> temp[7] >> temp[8] >> temp[9];
+                           >> temp[6] >> temp[7] >> temp[8] >> temp[9];
          
          labels.push_back(temp);
      }
      fboxes.close();
      
-     LOG(INFO) << "Found " << numboxes << " boxes";
-
-     // Change imgfilename to point to the right path on the server
-     imgfilename.erase(imgfilename.begin(), 
-            imgfilename.begin() + strlen("/nfs/onega_no_backups1/users/amahend1/"));
-     imgfilename = "/data/VOCdevkit/" + imgfilename;
-     
-     // Iterate through the boxes and write things to leveldb
-     cv::Mat img = cv::imread(imgfilename);
-     if(img.empty()) {
-        LOG(ERROR) << "Image read " << imgfilename << " failed";
-        continue;
-     }
      for(int boxno = 0; boxno < numboxes; boxno++) {
          if(labels[boxno][2] == 1 && labels[boxno][9] != 1) {  
            continue;  //Only the ground truth bounding boxes are the positives. The negatives come from selective search windows
          }
-         /*if(labels[boxno][9] == 1 && imgset == 2) { 
-           continue; // for now remove the ground truth labels from validation data.
-         }*/
-         cv::Mat imgcropped;
-         cv::Rect roi(boxes[boxno][0], boxes[boxno][1], boxes[boxno][2]-boxes[boxno][0], boxes[boxno][3]-boxes[boxno][1]);
-         cv::Mat(img, roi).copyTo(imgcropped);
-         cv::Mat imgcroppedresized;
-         cv::resize(imgcropped, imgcroppedresized, cv::Size(224, 224), 0, 0, cv::INTER_LANCZOS4);
-
-         //cv::imshow("debug", imgcroppedresized);
-         //cv::waitKey(50);
-         // now convert this to datum 
-         // note that labels[boxno][2] is not the right label because we have pruned out other boxes.
-         convert_image_to_datum(imgcroppedresized, labels[boxno][2], &datum);
-
-         snprintf(key_cstr, maxKeyLength, "%08d_%s_%08d", line_id, lines[line_id].c_str(), boxno);
-         string value;
-         datum.SerializeToString(&value);
-         batch->Put(string(key_cstr), value);
-         if (++count % 1000 == 0) {
-           db->Write(leveldb::WriteOptions(), batch);
-           LOG(ERROR) << "Processed " << count << " files.";
-           delete batch;
-           batch = new leveldb::WriteBatch();
-         }
+         count++;
      }
   }
-  // write the last batch
+
+  std::cout << "Total boxes: " << count << std::endl;
+/*  // write the last batch
   if (count % 1000 != 0) {
     db->Write(leveldb::WriteOptions(), batch);
     LOG(ERROR) << "Processed " << count << " files.";
   }
   delete batch;
-  delete db;
+  delete db;*/
   return 0;
 }
 
