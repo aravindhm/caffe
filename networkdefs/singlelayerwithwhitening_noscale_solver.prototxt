@@ -1,0 +1,14 @@
+train_net: "networkdefs/singlelayerwithwhitening_noscale.prototxt"
+test_iter: 0
+test_interval: 100000
+base_lr: 0.1
+lr_policy: "step"
+gamma: 0.9
+stepsize: 1000
+display: 10
+max_iter: 100000
+momentum: 0.9
+weight_decay: 0.0005
+snapshot: 1000
+snapshot_prefix: "/localdata/singlelayerwithwhitening_noscale"
+solver_mode: 1

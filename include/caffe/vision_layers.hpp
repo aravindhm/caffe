@@ -238,6 +238,26 @@ class WhiteningLayer : public Layer<Dtype> {
 };
 
 template <typename Dtype>
+class MeanSubtractLayer : public Layer<Dtype> {
+ public:
+  explicit MeanSubtractLayer(const LayerParameter& param)
+      : Layer<Dtype>(param) {}
+  virtual void SetUp(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+
+ protected:
+  virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+  virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+
+  virtual Dtype Backward_cpu(const vector<Blob<Dtype>*>& top,
+      const bool propagate_down, vector<Blob<Dtype>*>* bottom);
+  virtual Dtype Backward_gpu(const vector<Blob<Dtype>*>& top,
+      const bool propagate_down, vector<Blob<Dtype>*>* bottom);
+};
+
+template <typename Dtype>
 class ComputeCovarianceLayer : public Layer<Dtype> {
  public:
   explicit ComputeCovarianceLayer(const LayerParameter& param)
@@ -312,6 +332,22 @@ class CroppingLayer : public Layer<Dtype> {
   int WIDTH_OUT_;
   int STARTX_;
   int STARTY_;
+};
+
+template <typename Dtype>
+class DumpLayer : public Layer<Dtype> {
+ public:
+  explicit DumpLayer(const LayerParameter& param)
+      : Layer<Dtype>(param) {}
+  virtual void SetUp(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+
+ protected:
+  virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+  virtual Dtype Backward_cpu(const vector<Blob<Dtype>*>& top,
+      const bool propagate_down, vector<Blob<Dtype>*>* bottom) {}
+  int iter_;
 };
 
 template <typename Dtype>

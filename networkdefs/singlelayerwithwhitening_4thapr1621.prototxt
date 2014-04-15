@@ -1,0 +1,115 @@
+name: "CaffeNet"
+layers {
+  layer {
+    name: "data"
+    type: "data"
+    source: "/localdata/kitti_t1_half_leveldb/"
+    meanfile: "/localdata/kitti_t1_half_mean.binaryproto"
+    batchsize: 32
+    cropsize: 84
+    mirror: true
+    scale: 0.003921569
+  }
+  top: "data"
+  top: "label"
+}
+layers {
+  layer {
+    name: "data_whitening_layer"
+    type: "whitening"
+    whitening_matrix_file: "./networkdefs/zcamatrix.binaryproto"
+  }
+  bottom: "data"
+  top: "data_whitened"
+}
+layers {
+  layer {
+    name: "data_padder"
+    type: "padding"
+    pad: 5
+  }
+  bottom: "data_whitened"
+  top: "data_padded"
+}
+layers {
+  layer {
+    name: "conv1"
+    type: "conv"
+    num_output: 36
+    kernelsize: 11
+    stride: 1
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.
+    }
+    blobs_lr: 1.
+    blobs_lr: 2.
+    weight_decay: 1.
+    weight_decay: 0.
+  }
+  bottom: "data_padded"
+  top: "conv1"
+}
+layers {
+  layer {
+    name: "tanh1"
+    type: "tanh"
+  }
+  bottom: "conv1"
+  top: "conv1_tanh"
+}
+layers {
+  layer {
+    name: "l1normreg1"
+    type: "regularizer_as_loss"
+    regularizer: L1
+    regularizer_coeff: 0.00000000295
+  }
+  bottom: "conv1_tanh"
+}
+layers {
+  layer {
+    name: "conv1_tanh_padder"
+    type: "padding"
+    pad: 2
+  }
+  bottom: "conv1_tanh"
+  top: "conv1_tanh_padded"
+}
+layers {
+  layer {
+    name: "conv1_reconstuctor"
+    type: "conv"
+    num_output: 3
+    kernelsize: 5
+    stride: 1
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.
+    }
+    blobs_lr: 1.
+    blobs_lr: 2.
+    weight_decay: 1.
+    weight_decay: 0.
+  }
+  bottom: "conv1_tanh_padded"
+  top: "data_reconstructed"
+}
+layers {
+  layer {
+     name: "reconstruction_error1"
+     type: "euclidean_loss"
+     scale: 0.000047241
+  }
+  bottom: "data_reconstructed"
+  bottom: "data_whitened"
+  top: "loss"
+}

@@ -43,7 +43,7 @@ Layer<Dtype>* GetLayer(const LayerParameter& param) {
     return new InnerProductLayer<Dtype>(param);
   } else if (type == "compute_covariance") {
     return new ComputeCovarianceLayer<Dtype>(param);
-  } else if (type == "whitening_layer") {
+  } else if (type == "whitening") {
     return new WhiteningLayer<Dtype>(param);
   } else if (type == "lrn") {
     return new LRNLayer<Dtype>(param);
@@ -69,6 +69,8 @@ Layer<Dtype>* GetLayer(const LayerParameter& param) {
     return new SplitLayer<Dtype>(param);
   } else if (type == "data_shift") {
     return new DataShiftLayer<Dtype>(param);
+  } else if (type == "dump") {
+    return new DumpLayer<Dtype>(param);
   } else if (type == "multinomial_logistic_loss") {
     return new MultinomialLogisticLossLayer<Dtype>(param);
   } else {

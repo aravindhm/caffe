@@ -32,9 +32,10 @@ void WhiteningLayer<Dtype>::SetUp(const vector<Blob<Dtype>*>& bottom,
     CHECK_EQ(whitening_matrix_.width(), bottom[0]->count()/bottom[0]->num());
     CHECK_EQ(whitening_matrix_.height(), bottom[0]->count()/bottom[0]->num());
 
-    M_ = whitening_matrix_.width();
-    K_ = M_;
-    N_ = bottom[0]->num();
+    M_ = bottom[0]->num();
+    K_ = bottom[0]->count() / bottom[0]->num();
+    N_ = K_;
+
     (*top)[0]->Reshape(bottom[0]->num(), bottom[0]->channels(), 
        bottom[0]->height(), bottom[0]->width());
   }
@@ -57,24 +58,25 @@ void WhiteningLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   }
   const Dtype* whitening_matrix_data = this->whitening_matrix_.cpu_data();
   caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasTrans, M_, N_, K_, (Dtype)1.,
-      whitening_matrix_data, bottom_data, (Dtype)0., top_data);
+      bottom_data, whitening_matrix_data, (Dtype)0., top_data);
 }
 
 template <typename Dtype>
 void WhiteningLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     vector<Blob<Dtype>*>* top) {
-  const Dtype* bottom_data = bottom[0]->gpu_data();
-  Dtype* bottom_data_mutable = bottom[0]->mutable_gpu_data();
+  const Dtype* bottom_data_cpu = bottom[0]->cpu_data();
+  Dtype* bottom_data_mutable_cpu = bottom[0]->mutable_cpu_data();
   Dtype* top_data = (*top)[0]->mutable_gpu_data();
   int dim = bottom[0]->count()/bottom[0]->num();
   // First subtract the mean
   for(int i = 0; i < bottom[0]->num(); i++) {
-    Dtype mean = caffe_gpu_mean(dim, bottom_data + i*dim);
-    caffe_gpu_sub(dim, bottom_data+i*dim, mean, bottom_data_mutable+i*dim);
+    Dtype mean = caffe_cpu_mean(dim, bottom_data_cpu + i*dim);
+    caffe_sub(dim, bottom_data_cpu+i*dim, mean, bottom_data_mutable_cpu+i*dim);
   }
+  const Dtype* bottom_data_gpu = bottom[0]->gpu_data();
   const Dtype* whitening_matrix_data = this->whitening_matrix_.gpu_data();
   caffe_gpu_gemm<Dtype>(CblasNoTrans, CblasTrans, M_, N_, K_, (Dtype)1.,
-      whitening_matrix_data, bottom_data, (Dtype)0., top_data);
+      bottom_data_gpu, whitening_matrix_data, (Dtype)0., top_data);
 }
 
 // The backward operations are dummy - they do not carry any computation.

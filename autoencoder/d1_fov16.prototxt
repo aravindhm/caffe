@@ -1,0 +1,84 @@
+name: "CaffeNet"
+layers {
+  layer {
+    name: "data"
+    type: "data"
+    source: "/leveldb/kitti/kitti_t1_halfshuffled_leveldb"
+    meanfile: "/data/kitti/kitti_t1_half_mean.binaryproto"
+    batchsize: 128
+    cropsize: 16
+    mirror: true
+    scale: 0.003921569
+  }
+  top: "data"
+  top: "label"
+}
+layers {
+  layer {
+    name: "fc1"
+    type: "innerproduct"
+    num_output: 2048
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.
+    }
+    blobs_lr: 1.
+    blobs_lr: 2.
+    weight_decay: 0.
+    weight_decay: 0.
+  }
+  bottom: "data"
+  top: "fc1"
+}
+layers {
+  layer {
+    name: "l1normreg1"
+    type: "regularizer_as_loss"
+    regularizer: L1
+    regularizer_coeff: 0.000488281
+  }
+  bottom: "fc1"
+}
+layers {
+  layer {
+    name: "fc2"
+    type: "innerproduct"
+    num_output: 768
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.
+    }
+    blobs_lr: 1.
+    blobs_lr: 2.
+    weight_decay: 0.
+    weight_decay: 0.
+  }
+  bottom: "fc1"
+  top: "data_reconstructed"
+}
+layers {
+  layer {
+    name: "data_flatten"
+    type: "flatten"
+  }
+  bottom: "data"
+  top: "data_flat"
+}
+layers {
+  layer {
+     name: "reconstruction_error1"
+     type: "euclidean_loss"
+     scale: 0.001302083
+  }
+  bottom: "data_reconstructed"
+  bottom: "data_flat"
+  top: "loss"
+}

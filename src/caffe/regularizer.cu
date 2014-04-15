@@ -66,6 +66,7 @@ Dtype L1Regularizer<Dtype>::Regularize_gpu(Blob<Dtype>* bottom) {
   CUDA_POST_KERNEL_CHECK;
   Dtype penalty = 0;
   caffe_gpu_asum < Dtype > (count, data, &penalty);
+  LOG(INFO) << this->coeff_ * penalty;
   return this->coeff_ * penalty;
 }
 
